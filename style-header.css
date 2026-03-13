@@ -16,8 +16,6 @@ body {
     height: 100%;
     overflow: hidden; /* Чтобы не было скролла */
     background-color: #0d1117; /* Базовый темный фон */
-
-
     
     display: flex;
     flex-direction: column;
@@ -51,8 +49,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 5%;
-    background: rgba(13, 17, 23, 0.95);
+    padding: 25px 5%;
+    background: rgb(13, 17, 23);
     border-bottom: 2px solid var(--accent-cyan);
     box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
 }
@@ -65,7 +63,7 @@ body {
     width: 100px; 
     height: 100px; 
     border-radius: 10px; 
-    border: 1px solid var(--accent-cyan); 
+    border: 2px solid var(--accent-cyan); 
     box-shadow: 0px 8px 50px #11ccdabb;
 }
 .brand-name { 
@@ -133,11 +131,26 @@ body {
     box-shadow: 0 0 10px var(--accent-cyan); 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
 /* Выпадающий список */
 .dropdown { 
     position: relative; 
-    display: inline-block; 
+    /* inline-flex заставляет контейнер быть ровно по ширине кнопки */
+    display: inline-flex; 
+    flex-direction: column;
 }
+
 .dropbtn {
     background: var(--card-bg);
     color: white;
@@ -146,24 +159,32 @@ body {
     box-shadow: 0px 8px 40px #11ccdabb;
     cursor: pointer;
     border-radius: 10px;
+    width: 100%; /* Кнопка занимает всю ширину контейнера */
+    white-space: nowrap; /* Чтобы текст не переносился */
 }
+
 .dropbtn:hover { 
     background: var(--accent-cyan); 
     color: #000; 
     box-shadow: 0 0 10px var(--accent-cyan); 
 }
+
 .dropdown-content {
     display: none;
     position: absolute;
-    right: 0;
+    top: 100%;    /* Сразу под кнопкой */
+    left: 0;      /* Выравнивание по левому краю */
+    width: 100%;  /* ГЛАВНОЕ: Ширина ровно как у кнопки */
+    
     background: var(--card-bg);
-    min-width: 130px;
+    margin-top: 5px; /* Небольшой зазор для красоты */
     box-shadow: 0px 8px 40px #11ccdabb;
     z-index: 100;
     border: 1px solid var(--border-color);
     border-radius: 10px;
-    
+    box-sizing: border-box; /* Чтобы рамка не увеличивала ширину */
 }
+
 .dropdown-content a {
     color: rgb(223, 223, 223);
     padding: 10px 10px;
@@ -171,14 +192,32 @@ body {
     display: block;
     text-align: center;
 }
+
 .dropdown-content a:hover { 
     background: var(--border-color); 
     color: var(--accent-cyan); 
-    border-radius: 10px;
+    border-radius: 8px; /* Чуть меньше основного, чтобы вписалось внутрь */
 }
+
+/* Класс для показа (через JS) или можно добавить .dropdown:hover .dropdown-content { display: block; } */
 .show { 
     display: block;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -186,18 +225,15 @@ body {
 .main-content {
     flex: 1 0 auto;
 }
-
-
 /* Основной контейнер футера */
 .footer {
     flex-shrink: 0;
     padding: 30px 0;
-    background: rgba(11, 14, 20, 0.9); /* Плотный темный фон */
+    background: rgb(11, 14, 20); /* Плотный темный фон */
     border-top: 1px solid rgba(0, 242, 255, 0.2); /* Тонкая неоновая линия сверху */
     position: relative;
     z-index: 10;
 }
-
 /* Контент внутри футера */
 .footer-content {
     display: flex;
@@ -207,27 +243,23 @@ body {
     align-items: center;
     gap: 15px; /* Расстояние между иконками и текстом копирайта */
 }
-
 /* Блок с иконками */
 .social-links {
     display: flex;
     gap: 25px;
 }
-
 .social-links a {
     color: rgba(255, 255, 255, 0.5); /* В обычном состоянии иконки тусклые */
     font-size: 22px; 
     transition: all 0.3s ease; /* Плавный переход цвета и тени */
     text-decoration: none;
 }
-
 /* Эффект при наведении курсора */
 .social-links a:hover {
     color: #00f2ff; /* Основной неоновый цвет сайта */
     text-shadow: 0 0 15px #11ccdabb, 0 0 5px #11ccdabb; /* Свечение как у твоих узлов */
     transform: translateY(-3px); /* Иконка немного подпрыгивает */
 }
-
 /* Текст копирайта */
 .copyright {
     color: rgba(255, 255, 255, 0.4);
@@ -238,7 +270,7 @@ body {
 
 @media (max-width: 768px) {
     .header {
-        padding: 15px;
+        padding: 4px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -290,13 +322,35 @@ body {
         padding: 0 5px;
         height: 45px; 
     }
-
-    .dropdown-content{
-        min-width: 230px;
-    }
-
+   
     .brand-name{
         font-size: 2.5rem; 
+    }
+}
+
+/* Адаптив для мобильных устройств */
+@media (max-width: 600px) {
+    .footer {
+        padding: 20px 0; /* Уменьшаем внутренние отступы футера */
+    }
+
+    .footer-content {
+        gap: 20px; /* Увеличиваем расстояние между иконками и текстом для кликабельности */
+    }
+
+    .social-links {
+        gap: 30px; /* Еще больше места между иконками, чтобы не промахнуться пальцем */
+    }
+
+    .social-links a {
+        font-size: 26px; /* Увеличиваем сами иконки для удобства нажатия */
+    }
+
+    .copyright {
+        font-size: 12px; /* Чуть уменьшаем текст, чтобы он смотрелся аккуратнее */
+        text-align: center;
+        padding: 0 15px; /* Боковые отступы, чтобы текст не прилипал к краям экрана */
+        line-height: 1.5; /* Увеличиваем межстрочный интервал */
     }
 }
 

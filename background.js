@@ -5,11 +5,11 @@ let width, height, particles = [];
 let mouse = { x: null, y: null, radius: 150 };
 
 const SETTINGS = {
-    particleCount: 80,    // Количество узлов (не делай больше 120 для скорости)
-    maxDistance: 120,    // Расстояние, при котором появляется связь
+    particleCount: 50,    // Количество узлов (не делай больше 120 для скорости)
+    maxDistance: 160,    // Расстояние, при котором появляется связь
     particleSize: 1.5,   // Размер точки
-    lineOpacity: 0.15,   // Максимальная яркость линий
-    speed: 0.4           // Скорость движения
+    lineOpacity: 0.25,   // Максимальная яркость линий
+    speed: 0.3           // Скорость движения
 };
 
 function setCanvasSize() {
@@ -41,8 +41,8 @@ class Particle {
             let dy = mouse.y - this.y;
             let distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < mouse.radius) {
-                this.x += dx * 0.005;
-                this.y += dy * 0.005;
+                this.x += dx * 0.0015;
+                this.y += dy * 0.0015;
             }
         }
     }
