@@ -228,7 +228,7 @@ body {
 /* Основной контейнер футера */
 .footer {
     flex-shrink: 0;
-    padding: 30px 0;
+    padding: 50px 0;
     background: rgb(11, 14, 20); /* Плотный темный фон */
     border-top: 1px solid rgba(0, 242, 255, 0.2); /* Тонкая неоновая линия сверху */
     position: relative;
@@ -329,7 +329,7 @@ body {
 }
 
 /* Адаптив для мобильных устройств */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .footer {
         padding: 20px 0; /* Уменьшаем внутренние отступы футера */
     }
