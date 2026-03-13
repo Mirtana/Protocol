@@ -32,8 +32,8 @@ class Particle {
         this.y += this.vy;
 
         // Отскок от краев экрана
-        if (this.x < 0 || this.x > width) this.vx *= -1.5;
-        if (this.y < 0 || this.y > height) this.vy *= -1.5;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
 
         // Взаимодействие с мышью (легкое притяжение)
         if (mouse.x !== null) {
