@@ -262,7 +262,7 @@ body {
 }
 /* Текст копирайта */
 .copyright {
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(0, 255, 255);
     font-size: 13px;
     letter-spacing: 0.5px;
     margin: 0; /* Убираем лишние отступы */
