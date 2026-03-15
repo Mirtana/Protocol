@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MirtanaProtocol | DeFi</title>
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="main_container_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+   
+
+</head>
+
+<body>
+
+
+    <header class="header">
+        <div class="header-left">
+
+            <img src="img\MIRTAlogo.png" alt="Mirtana" class="logo">
+
+            <span class="brand-name">MirtanaProtocol</span>
+        </div>
+
+        <div class="header-right">
+            <div id="balances" class="balances hidden">
+                <div class="balance-item">
+                    
+                    <i class="fab fa-ethereum"></i> <span id="native-balance">0.00</span>
+
+                </div>
+                <div class="balance-item highlight">
+
+                    <i class="fas fa-coins"></i> MIRTA: <span id="mirta-balance">0.00</span>
+
+                </div>
+            </div>
+
+            <div class="dropdown" id="network-dropdown">
+
+                <button class="dropbtn" id="current-network"><i class="fas fa-network-wired"></i>Chain Network</button>
+                
+                <div class="dropdown-content" id="network-list">
+
+                    <a href="#" data-chain-id="0xb626">Robinhood</a> 
+                    <a href="#" data-chain-id="0xaa36a7">Sepolia</a>
+
+                
+                </div>
+            </div>
+
+            <button id="connect-btn" class="connect-button"><i class="fas fa-wallet"></i> Connect Wallet</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="section-block"> 
+            
+            <div class="faucet-container">
+                <span class="faucet-label">Get Test Tokens</span>
+                <div class="faucet-links">
+                    <a href="https://faucet.testnet.chain.robinhood.com" target="_blank" class="faucet-chip">
+                        <i class="fas fa-parachute-box"></i> Robinhood
+                    </a>
+                </div>
+            </div>
+    
+            <h2 class="section-title">
+                TOKEN <span>MINT</span> <span class="title-icon-after">✔</span>
+            </h2>
+    
+            <div class="glass-card mint-card">
+                <div class="price-info">Price: <span id="priceDisplay">...</span></div>
+                
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span id="soldPercentage">0% SOLD</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="supplyBar" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+    
+                <div class="input-container">
+                    <label>You Pay</label>
+                    <div class="web3-input">
+                        <input type="number" id="mintAmountEth" placeholder="0.0">
+                        <span id="nativeTickerInput" class="token-tag" style="margin-right: 12px;">NATIVE</span>
+                        <button class="max-badge" onclick="setMaxMint()">MAX</button>
+                    </div>
+                </div>
+    
+                <div class="result-calc">
+                    You Receive: <strong id="calcOutput">0 MCF</strong>
+                </div>
+    
+                <button id="mintBtn" class="action-btn centered-btn" onclick="mintToken()" disabled>
+                    <span id="mintBtnText">CONNECT WALLET</span>
+                </button>
+                
+                <button class="add-token-btn" onclick="addTokenToWallet()">+ Add MCF to Metamask</button>
+            </div>
+        </section>  
+    </main>
+    
+    <footer class="footer">
+        <div class="container footer-content">
+            <p class="copyright">© 2026 Mirtana Protocol. Built for Robinhood Chain Testnet.</p>
+            <div class="social-links">
+                <a href="https://x.com/MirtanaProtocol" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://t.me/mirtanaprotocol" target="_blank"><i class="fab fa-telegram"></i></a>
+                <a href="https://discord.gg/SdwEBqRrQj" target="_blank"><i class="fab fa-discord"></i></a>
+                <a href="https://github.com/Mirtana/Protocol.git" target="_blank"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="app-connect.js"></script>
+
+    <canvas id="circuitCanvas"></canvas>
+
+    <script src="background.js"></script>
+
+</body>
+</html>
+
+
+
