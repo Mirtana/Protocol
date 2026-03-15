@@ -165,7 +165,7 @@ async function syncNetworkDisplay() {
             if (tickerInput) tickerInput.innerText = config.nativeTicker;
         } else if (networkBtn) {
             // Если сеть не в нашем списке
-            networkBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Unknown Network`;
+            networkBtn.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Select Network`;
         }
     } catch (e) {
         console.error("Ошибка определения сети:", e);
