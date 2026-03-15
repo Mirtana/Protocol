@@ -261,7 +261,7 @@ if (networkList) {
                             chainId: '0xb626', // Это 46630 в hex
                             chainName: config.networkName,
                             rpcUrls: ["https://rpc.testnet.chain.robinhood.com"], // Замени на актуальный RPC если другой
-                            nativeCurrency: { name: "RHO", symbol: "RHO", decimals: 18 },
+                            nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
                             blockExplorerUrls: [config.explorerUrl]
                         }]
                     });
