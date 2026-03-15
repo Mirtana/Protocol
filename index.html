@@ -117,6 +117,22 @@
     </footer>
 
 
+
+    <div id="txModal" class="modal-overlay hidden">
+        <div class="modal-contentmint">
+            <button class="close-x" onclick="closeModal()">&times;</button>
+            <div id="modalIcon" class="modal-icon"></div>
+            <h3 id="modalTitle">Success!</h3>
+            <div id="modalDesc"></div>
+            <div id="modalLinkHolder" class="modal-link-holder"></div>
+            
+            <button id="modalCloseBtn" class="modal-action-btn" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+
+    
+
     <script src="app-connect.js"></script>
 
     <canvas id="circuitCanvas"></canvas>
