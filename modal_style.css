@@ -70,30 +70,44 @@
 
 @media (max-width: 480px) {
     .modal-overlay {
-        padding: 15px; /* Чтобы окно не липло к краям экрана */
+        padding: 20px; /* Чтобы окно не липло к краям экрана */
     }
 
     .modal-contentmint {
-        padding: 40px 20px 30px 20px; /* Увеличили верхний отступ для кнопки закрытия */
+        padding: 30px 20px; /* Увеличили верхний отступ для кнопки закрытия */
         width: 100%; /* Занимаем всё доступное место */
+        max-width: 320px;
         max-width: none;
-        border-radius: 16px;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
     .modal-icon {
-        font-size: 42px; /* Чуть меньше иконка */
-        margin-bottom: 10px;
+       font-size: 38px;   /* Чуть уменьшаем иконку для баланса */
+        margin-bottom: 12px;
     }
 
     #modalTitle {
-        font-size: 1.25rem;
+        font-size: 20px;
+        margin-bottom: 8px;
     }
 
     #modalDesc {
-        font-size: 14px; /* Оптимально для чтения с телефона */
+        font-size: 14px;
         line-height: 1.4;
+        color: #ccc;
     }
 
+
+      /* Кнопка OK на мобилках */
+    .modal-action-btn {
+        width: 120px;     /* Делаем её компактной, а не во всю ширину */
+        padding: 10px;
+        font-size: 14px;
+        margin-top: 20px;
+        border-radius: 12px;
+    }
+    
     .close-x {
         top: 10px;
         right: 10px;
@@ -102,10 +116,11 @@
     }
 
     .modal-link-holder a {
-        font-size: 13px;
+        font-size: 12px;
         padding: 12px;
         background: rgba(255, 255, 255, 0.03); /* Выделяем ссылку как кнопку */
         border-radius: 10px;
         margin-top: 20px;
+        margin-bottom: 5px;
     }
 }
