@@ -74,37 +74,23 @@
 
 @media (max-width: 480px) {
 
-        .modal-overlay {
-    display: flex;          /* Включаем flex */
-    align-items: center;    /* Центрируем по вертикали */
-    justify-content: center; /* Центрируем по горизонтали */
-    position: fixed;        /* Чтобы окно перекрывало весь экран */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7); /* Затемнение фона */
-    z-index: 1000;
-    padding: 20px;          /* Безопасные отступы */
-}
-
-
-    .modal-contentmint {
-        width: 100%;
-        max-width: 320px;      /* Ограничиваем ширину, чтобы не было слишком широко */
-        margin: 0 auto;        /* Дополнительная страховка центрирования */
-        padding: 30px 20px;
-        border-radius: 24px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        box-sizing: border-box; /* Важно, чтобы padding не расширял окно за экран */
-        
-        /* Если внутри элементы не по центру, добавьте это: */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
+    .modal-overlay {
+        padding: 15px; /* Чтобы точно было место по бокам */
+        box-sizing: border-box;
     }
 
+    .modal-contentmint {
+        width: 100% !important; /* Берем всю доступную ширину */
+        max-width: 320px !important;
+        margin: 0 auto;
+        padding: 40px 20px 25px 20px !important;
+        box-sizing: border-box !important;
+        position: relative;
+        left: 0 !important; /* Убираем любые левые смещения */
+        transform: none !important; /* Убираем любые трансформации */
+    }
+
+    
     .modal-icon {
        font-size: 38px;   /* Чуть уменьшаем иконку для баланса */
         margin-bottom: 12px;
