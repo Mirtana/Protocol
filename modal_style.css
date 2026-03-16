@@ -69,9 +69,21 @@
 }
 
 @media (max-width: 480px) {
-    .modal-overlay {
-        padding: 20px; /* Чтобы окно не липло к краям экрана */
-    }
+
+        .modal-overlay {
+    display: flex;          /* Включаем flex */
+    align-items: center;    /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
+    position: fixed;        /* Чтобы окно перекрывало весь экран */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7); /* Затемнение фона */
+    z-index: 1000;
+    padding: 20px;          /* Безопасные отступы */
+}
+
 
     .modal-contentmint {
         padding: 30px 20px; /* Увеличили верхний отступ для кнопки закрытия */
