@@ -76,7 +76,7 @@
     .modal-contentmint {
         padding: 30px 20px; /* Увеличили верхний отступ для кнопки закрытия */
         width: 100%; /* Занимаем всё доступное место */
-        max-width: 320px;
+        max-width: 250px;
         max-width: none;
         border-radius: 24px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
