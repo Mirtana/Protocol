@@ -1,0 +1,174 @@
+/* Сетка планов стейкинга */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+.plan-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.plan-card.active {
+    border-color: #00f2ff;
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+.plan-card h4 { 
+    margin: 0; 
+    font-size: 14px; 
+    color: #ccc; 
+}
+.plan-card .apy { 
+    display: block; 
+    font-size: 18px; 
+    font-weight: bold; 
+    color: #fff; 
+    margin-top: 5px; }
+
+/* Калькулятор и ввод */
+.reward-hint {
+    font-size: 12px;
+    color: #00f2ff;
+    margin-top: 8px;
+    text-align: right;
+}
+/* Список активных стеков */
+.stakes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.active-stake-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    padding: 15px;
+    border-left: 4px solid #00f2ff;
+}
+.stake-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+.stake-info-row span:first-child { 
+    color: rgba(255,255,255,0.6); 
+}
+.unstake-btn {
+    width: 100%;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid #ff4b2b;
+    color: #ff4b2b;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.unstake-btn:hover:not(:disabled) {
+    background: #ff4b2b;
+    color: white;
+}
+.unstake-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #555;
+    color: #555;
+}
+/* Контейнер карточки */
+.active-stake-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 242, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+.active-stake-card:hover {
+    border-color: rgba(0, 242, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+/* Группа статистики */
+.stake-main-info {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+.stake-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.stake-stat label {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.stake-stat span {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+}
+.plan-name {
+    color: #00f2ff !important;
+}
+.reward-value {
+    color: #00f2ff;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+}
+/* Кнопка Unstake */
+.unstake-btn-modern {
+    background: transparent;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    padding: 10px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.unstake-btn-modern:hover:not(:disabled) {
+    background: #ff4d4d;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+}
+.unstake-btn-modern:disabled {
+    border-color: #444;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.countdown-timer {
+    font-family: 'Courier New', Courier, monospace;
+    color: #ffaa00;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/* Адаптивность для мобилок */
+@media (max-width: 600px) {
+    .active-stake-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    .stake-main-info {
+        gap: 20px;
+    }
+    .stake-action {
+        width: 100%;
+    }
+    .unstake-btn-modern {
+        width: 100%;
+    }
+}

@@ -1,0 +1,355 @@
+:root {
+    --bg-color: #0d1117;
+    --accent-cyan: #00f2ff;
+    --text-color: #e6edf3;
+    --card-bg: #161b22;
+    --border-color: #30363d;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: #0d1117;
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+
+#circuitCanvas {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.your-panel-class {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 5%;
+    background: rgb(13, 17, 23);
+    border-bottom: 2px solid var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+
+.header-left { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+}
+
+.logo { 
+    width: 100px; 
+    height: 100px; 
+    border-radius: 10px; 
+    border: 2px solid var(--accent-cyan); 
+    box-shadow: 0px 8px 50px #11ccdabb;
+}
+
+.brand-name { 
+    font-size: 2.3rem; 
+    letter-spacing: 1px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #fff, var(--accent-cyan));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+}
+
+.balances { 
+    display: flex; 
+    gap: 10px; 
+    font-size: 0.9rem; 
+}
+
+.balance-item { 
+    background: var(--card-bg);
+    padding: 5px 10px; 
+    border-radius: 20px; 
+    border: 1px solid var(--border-color); 
+    box-shadow: 0px 8px 50px #11ccdabb; 
+}
+
+.highlight { 
+    color: var(--accent-cyan); 
+    font-weight: bold; 
+    box-shadow: 0px 8px 50px #11ccdabb; 
+}
+
+.hidden { 
+    display: none; 
+}
+
+/* Отступ между иконкой и текстом */
+.header i {
+    margin-right: 8px;
+    font-size: 0.9em;
+    vertical-align: middle;
+}
+
+/* Специфический цвет для иконки кошелька */
+.connect-button i {
+    color: var(--accent-cyan);
+}
+
+/* Эффект свечения для иконок в кнопках */
+.connect-button:hover i {
+    color: #000;
+}
+
+/* Центрирование контента внутри кнопок */
+.dropbtn, .connect-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.connect-button {
+    background: transparent;
+    color: var(--accent-cyan);
+    border: 1px solid var(--accent-cyan);
+    box-shadow: 0px 8px 40px #11ccdabb;
+    padding: 8px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 600;
+}
+.connect-button:hover { 
+    background: var(--accent-cyan); 
+    color: #000; 
+    box-shadow: 0 0 10px var(--accent-cyan); 
+}
+
+/* Выпадающий список */
+.dropdown { 
+    position: relative; 
+    display: inline-flex; 
+    flex-direction: column;
+}
+
+.dropbtn {
+    background: var(--card-bg);
+    color: white;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0px 8px 40px #11ccdabb;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.dropbtn:hover { 
+    background: var(--accent-cyan); 
+    color: #000; 
+    box-shadow: 0 0 10px var(--accent-cyan); 
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    
+    background: var(--card-bg);
+    margin-top: 5px;
+    box-shadow: 0px 8px 40px #11ccdabb;
+    z-index: 100;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.dropdown-content a {
+    color: rgb(223, 223, 223);
+    padding: 10px 0 10px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.dropdown-content a:hover { 
+    background: var(--border-color); 
+    color: var(--accent-cyan); 
+    border-radius: 8px;
+}
+
+.show { 
+    display: block;
+}
+
+.main-content {
+    flex: 1 0 auto;
+}
+
+/* Основной контейнер футера */
+.footer {
+    flex-shrink: 0; /* Не позволяет футеру сжиматься */
+    width: 100%;
+    background: rgb(19, 22, 34); /* Полупрозрачность для стиля */
+    padding: 20px 0;
+    z-index: 10;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column-reverse; 
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.social-links {
+    display: flex;
+    gap: 25px;
+}
+
+.social-links a {
+    color: rgb(253, 253, 253);
+    font-size: 22px; 
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-links a:hover {
+    color: #00f2ff;
+    text-shadow: 0 0 15px #11ccdabb, 0 0 5px #11ccdabb;
+    transform: translateY(-3px);
+}
+
+.copyright {
+    color: rgba(0, 255, 255);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Адаптив для мобильных устройств */
+
+@media (max-width: 768px) {
+    .header {
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .header-left {
+        width: 100%;
+        justify-content: center;
+        padding-left: 0;
+    }
+
+    .brand-name {
+        font-size: 1.5rem;
+        padding-left: 0 !important;
+        text-align: center;
+    }
+
+    .header-right {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .balances {
+        grid-column: span 2;
+        flex-direction: row; 
+        justify-content: center;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .balance-item {
+        flex: 1; 
+        text-align: center;
+        font-size: 0.8rem;
+    }
+
+    .dropdown, #connect-btn {
+        width: 100%;
+        margin: 0;
+    }
+
+    .dropbtn, .connect-button {
+        width: 100%;
+        font-size: 0.85rem;
+        padding: 0 5px;
+        height: 45px; 
+    }
+   
+    .brand-name{
+        font-size: 2.5rem; 
+    }
+}
+
+@media (max-width: 600px) {
+
+    body {
+        min-height: 100dvh; 
+    }
+
+    .footer {
+        padding: 20px 0 40px o;
+        background: rgb(11, 14, 20);
+    }
+
+    .footer-content {
+        gap: 12px;
+    }
+
+    .social-links {
+        gap: 25px;
+    }
+
+    .social-links a {
+        font-size: 24px;
+        
+    }
+
+    .copyright {
+        font-size: 12px;
+        text-align: center;
+        padding: 0 15px;
+        line-height: 1.5;
+        opacity: 0.6;
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .header-right {
+        grid-template-columns: 1fr; 
+    }
+
+    .balances {
+        grid-column: span 1;
+        flex-direction: column;
+    }
+}

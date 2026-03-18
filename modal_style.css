@@ -1,0 +1,222 @@
+/* Модульное Окно Для Минта */
+
+.modal-overlay {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    z-index: 1000; 
+    transition: 0.3s;
+}
+.modal-overlay.hidden { 
+    display: none; 
+    opacity: 0; 
+}
+.modal-contentmint {
+    position: relative; 
+    background: #0d1117;
+    border: 1px solid rgba(0, 255, 255, 0.3); 
+    border-radius: 20px;
+    max-width: 320px;
+    padding: 30px 25px; 
+    margin: 20% auto;
+    text-align: center; 
+    width: 90%;
+    color: white;
+}
+.close-x {
+    position: absolute; 
+    top: 15px; 
+    right: 15px; 
+    background: none;
+    border: none; 
+    color: #666; 
+    font-size: 24px; 
+    cursor: pointer;
+}
+.modal-icon { 
+    font-size: 30px; 
+    margin-bottom: 15px; 
+}
+.modal-link-holder a {
+    color: #00ff88; 
+    text-decoration: none; 
+    font-size: 14px;
+    display: block; 
+    margin-top: 15px; 
+    border-top: 1px solid #333; 
+    padding-top: 10px;
+}
+#modalDesc {
+    white-space: pre-line;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+.modal-action-btn {
+    display: none;
+    margin: 25px auto 0 auto;
+    width: 110px;
+    padding: 10px 20px;
+    background: #00c8d4;
+    color: #0d1117;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: inherit;
+
+}
+.modal-action-btn:hover {
+    background: #00cc6e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
+}
+.modal-action-btn:active {
+    transform: translateY(0);
+}
+
+/* Стили для иконок */
+.loading-icon { 
+    color: #00f2ff;
+    animation: spin 2s linear infinite; 
+}
+@keyframes spin { 
+    0% { 
+        transform: rotate(0deg); 
+    } 
+    100% { 
+        transform: rotate(360deg); 
+    } 
+}
+
+/*-----------------------------------------------------------------------------------------------------------------------
+
+
+/* Модульное Окно Для Стейкинга */
+
+#statusModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+}
+.status-content {
+    position: relative;
+    background: #0f1216;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    max-width: 320px;
+    padding: 30px 25px;
+    margin: 20% auto;
+    text-align: center;
+    width: 90%;
+    color: white;
+}
+#statusCloseBtn {
+    display: block;
+    margin: 25px auto 0 auto;
+    background: #00f2ff;
+    color: #000;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    transition: 0.3s;
+}
+#statusCloseBtn:hover {
+    background: #00c8d4;
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+    transform: translateY(-2px);
+}
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #ff4d4d; /* Красный цвет */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    line-height: 1;
+}
+.close-modal:hover {
+    color: #ff0000;
+    transform: scale(1.2);
+}
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 242, 255, 0.1);
+    border-top: 3px solid #00f2ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.explorer-link {
+    color: #00f2ff;
+    text-decoration: none;
+    font-size: 14px;
+    border-bottom: 1px dashed #00f2ff;
+}
+.explorer-link:hover {
+    opacity: 0.7;
+}
+#statusTitle {
+    color: #fff;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+#statusMessage {
+    color: #8a8d91;
+    line-height: 1.5;
+}
+
+
+/* АДАПТИВ МОДУЛЬНОГО ОКНА "МИНТА" ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+@media (max-width: 480px) {
+    .modal-icon {
+        font-size: 42px; /* Чуть меньше иконка */
+        margin-bottom: 10px;
+    }
+    #modalTitle {
+        font-size: 1.25rem;
+    }
+    #modalDesc {
+        font-size: 14px; /* Оптимально для чтения с телефона */
+        line-height: 1.4;
+    }
+    .close-x {
+        top: 10px;
+        right: 10px;
+        font-size: 30px; /* Делаем крестик крупнее */
+        padding: 5px;   /* Увеличиваем область касания */
+    }
+    .modal-link-holder a {
+        font-size: 13px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.03); /* Выделяем ссылку как кнопку */
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+    .modal-action-btn {
+        width: 120px;
+        padding: 12px;
+    }
+}
