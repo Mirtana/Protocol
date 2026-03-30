@@ -48,6 +48,7 @@ async function connect() {
             await fetchMIRTAData();
             await updateBalances();
             await updateMintProgress();
+            await initSwap();
         }
           
         window.ethereum.on('accountsChanged', () => window.location.reload());
