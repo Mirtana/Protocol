@@ -94,7 +94,7 @@ body {
 .highlight { 
     color: var(--accent-cyan); 
     font-weight: bold; 
-    box-shadow: 0px 8px 50px #11ccdabb; 
+    /* box-shadow: 0px 8px 50px #11ccdabb;  */
 }
 
 .hidden { 
