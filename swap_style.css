@@ -1,0 +1,132 @@
+.swap-section {
+    display: flex;
+    justify-content: center;
+    width: 100%;           
+    padding: 0 10px;       
+    box-sizing: border-box; 
+    margin-top: 40px;
+}
+
+.swap-card {
+    background: rgba(15, 18, 24, 0);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    box-sizing: border-box;
+    padding: 30px;
+    width: 100%;           
+    max-width: 785px;      
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.swap-card h3 {
+    margin-top: 0;
+    text-align: center;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.highlight { color: #00f2ff; }
+
+.swap-price-info {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #8a8d91;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: #8a8d91;
+    margin-bottom: 8px;
+    margin-left: 5px;
+}
+
+.input-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+    background: #1a1d23;
+    border: 1px solid #333;
+    border-radius: 12px;
+    display: flex;
+    padding: 10px 15px;
+    transition: 0.3s;
+    
+}
+
+.input-wrapper:focus-within {
+    border-color: #00f2ff;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+}
+
+.input-wrapper input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    width: 100%;
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.token-symbol {
+    color: #00f2ff;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.swap-arrow {
+    text-align: center;
+    color: #00f2ff;
+    font-size: 1.5rem;
+    margin: 15px 0;
+}
+
+.swap-hint {
+    font-size: 0.7rem;
+    color: #555;
+    text-align: center;
+    margin-top: 15px;
+}
+
+#swapBtn {
+    width: 100%;
+    max-width: 100%;   
+    box-sizing: border-box;       
+    display: block;         
+    margin: 20px auto 0;
+    background: #00f2ff;
+    color: #000;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    
+}
+
+#swapBtn:hover {
+    background: #00d4e0;
+    box-shadow: 0 0 25px rgba(0, 242, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+#swapBtn:active {
+    transform: translateY(0);
+}
+
+#swapBtn:disabled {
+    background: #333;
+    color: #666;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+
+
+
