@@ -1,0 +1,79 @@
+.sub-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.nav-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 10px 25px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-item:hover {
+    color: #00f2ff;
+    border-color: #00f2ff;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+}
+
+.nav-item.active {
+    background: rgba(0, 242, 255, 0.1);
+    border-color: #00f2ff;
+    color: #00f2ff;
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+}
+
+/* Класс для скрытия неактивных секций */
+.tab-content {
+    display: none;
+    width: 100%;
+    animation: fadeIn 0.4s ease;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+.tab-content.active {
+    display: flex; /* Показываем блок */
+    flex-direction: column;
+    align-items: center; /* Центрируем карточку по горизонтали */
+    width: 100%;
+    animation: fadeIn 0.4s ease; /* Добавляем приятное появление */
+}
+.tab-content {
+    display: none; /* Скрыто по умолчанию */
+    width: 100%;
+    background: none; /* Убираем фон, если он есть */
+    border: none;     /* Убираем рамку */
+    padding: 0;       /* Убираем лишние отступы */
+}
+
+
+
+#gm-section .glass-card {
+    width: 400px; 
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+}

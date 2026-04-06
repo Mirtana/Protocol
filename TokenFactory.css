@@ -1,0 +1,286 @@
+/* --- ОСНОВНОЙ КОНТЕЙНЕР ФАБРИКИ --- */
+.factory-container {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 25px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- КАРТОЧКИ (СТЕКЛОМОРФИЗМ) --- */
+.factory-card {
+    background: rgba(0, 0, 0, 0.11);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Чтобы кнопка refresh была справа */
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.neon-text {
+    color: #00f2ff;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+/* --- ПОЛЯ ВВОДА --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    margin-bottom: 8px;
+    margin-left: 5px;
+    text-align: left;
+}
+
+.input-group input {
+    width: 100%;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0 15px;
+    color: white;
+    outline: none;
+    transition: 0.3s;
+    box-sizing: border-box;
+    font-size: 14px;
+    display: block;
+}
+
+.input-group input:focus {
+    border-color: #00f2ff;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* --- СЕЛЕКТОР ТИПА ТОКЕНА --- */
+.token-type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.type-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+    padding: 15px 5px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.type-option i { 
+    font-size: 20px; 
+    color: rgba(255, 255, 255, 0.4); 
+}
+
+.type-option.active {
+    background: rgba(0, 242, 255, 0.1);
+    border-color: #00f2ff;
+}
+
+.type-option.active i { 
+    color: #00f2ff; 
+}
+
+/* --- КНОПКА ДЕПЛОЯ --- */
+.deploy-btn {
+    width: 100%;
+    background: linear-gradient(45deg, #00f2ff, #0066ff);
+    border: none;
+    border-radius: 15px;
+    padding: 15px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.deploy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 242, 255, 0.4);
+}
+
+/* --- ОБНОВЛЕННЫЙ ДАШБОРД ТОКЕНОВ --- */
+.tokens-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.token-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.token-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(0, 242, 255, 0.3);
+    transform: translateX(5px);
+}
+
+.token-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.token-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.token-header h4 span {
+    color: #00f2ff;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgba(0, 242, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.token-stats span {
+    display: block;
+    margin-top: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.token-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.token-stats p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.token-stats strong {
+    color: #fff;
+}
+
+.token-stats span {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+/* Кнопка копирования */
+.copy-mini-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.copy-mini-btn:hover {
+    background: rgba(0, 242, 255, 0.15);
+    color: #00f2ff;
+    border-color: #00f2ff;
+}
+
+/* Анимация обновления (вращение иконки) */
+.refresh-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+.refresh-btn:hover {
+    color: #00f2ff;
+    transform: rotate(180deg);
+}
+
+/* --- АДАПТИВНОСТЬ --- */
+@media (max-width: 900px) {
+    .factory-container { 
+        grid-template-columns: 1fr; 
+    }
+}
+
+
+
+
+/* --- Media Queries для мобильных устройств --- */
+
+@media (max-width: 680px) {
+
+    /* 1. Находим контейнер, где лежит иконка молота и заголовок H3 */
+    .card-header, 
+    .generator-header { 
+        display: flex;
+        flex-direction: row; 
+        align-items: center;  
+        justify-content: center; 
+        gap: 15px;            
+        margin-bottom: 20px;
+        position: static;   
+        width: 100%;
+    }
+
+    /* 2. Стилизуем саму иконку молота внутри заголовка */
+    .generator-header i,
+    .generator-header img,
+    .hammer-icon { 
+        position: static;     
+        margin: 0;            
+        font-size: 1.5rem; 
+        transform: none; 
+    }
+
+    
+    .generator-header h3,
+    .generator-card h3 {
+        margin: 0;           
+        font-size: 1.3rem; 
+        text-align: center;
+    }
+}
+
+

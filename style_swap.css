@@ -1,0 +1,60 @@
+/* Состояние скрытого блока */
+.swap-container.hidden {
+    display: none !important; /* Полностью убирает место под блок */
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* Состояние активного блока */
+.swap-container {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Стилизация кнопки (под твой DeFi стиль) */
+.btn-neon {
+    background: transparent;
+    border: 2px solid #00e1ff;
+    color: #00e1ff;
+    padding: 10px 25px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(0, 225, 255, 0.2);
+}
+
+.btn-neon:hover {
+    background: #00e1ff;
+    color: #000;
+    box-shadow: 0 0 20px #00e1ff;
+}
+
+/* Базовое состояние контейнера */
+.swap-wrapper {
+    max-width: 750px;
+    margin: 0 auto;
+    overflow: hidden; /* Скрывает содержимое, когда высота 0 */
+    
+    /* Анимация: длительность 0.5 сек, мягкое ускорение/замедление */
+    transition: max-height 0.5s ease-in-out, opacity 0.4s ease, margin 0.5s ease;
+    
+    /* В закрытом состоянии */
+    max-height: 0; 
+    opacity: 0;
+    pointer-events: none; /* Чтобы нельзя было кликнуть по невидимому фрейму */
+}
+
+/* Состояние, когда блок открыт */
+.swap-wrapper.active {
+    max-height: 800px; /* Должно быть больше, чем высота iframe + отступы */
+    opacity: 1;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    pointer-events: auto;
+}
+
+.hidden {
+    display: none !important;
+}

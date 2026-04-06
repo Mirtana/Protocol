@@ -7,6 +7,10 @@ const ADDRESSES = {
         staking: "0x8AE8e28E19a66aDfD816Ab1833bAb8a734BDD09a",
         token: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
     },
+    5042002: {
+        staking: "0x5956ac1Fc6178EC22d873dD1aC371E35253F5ff6",
+        token: "0xad4d6Ed80F18768a1DdE5f2b6a97a900A5C874e1",
+    },
     11155111: { // Sepolia
         staking: "0x32446FdE8838482b3F8D0E4a9A28A1Df3cbCee5D", 
         token: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
@@ -77,6 +81,45 @@ async function initStaking() {
         } catch (e) { 
             console.error("Init Error:", e); 
         }
+    }
+}
+
+async function setMaxStake() {
+    // Проверка подключения
+    if (!userAccount || !signer) {
+        console.error("Wallet not connected");
+        return;
+    }
+
+    try {
+        // 1. Адрес твоего токена MIRTA (подставь свой актуальный адрес)
+        const MIRTA_TOKEN_ADDRESS = "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6"; 
+        
+        // 2. Минимальный ABI для получения баланса
+        const minABI = ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"];
+        
+        const tokenContract = new ethers.Contract(MIRTA_TOKEN_ADDRESS, minABI, provider);
+
+        // 3. Получаем баланс и количество знаков
+        const [balance, decimals] = await Promise.all([
+            tokenContract.balanceOf(userAccount),
+            tokenContract.decimals()
+        ]);
+
+        // 4. Форматируем в понятное число (например, из 1000000000000000000 в 1.0)
+        const formattedBalance = ethers.formatUnits(balance, decimals);
+
+        // 5. Подставляем в инпут по твоему ID 'stakeAmount'
+        const input = document.getElementById('stakeAmount');
+        if (input) {
+            input.value = formattedBalance;
+            
+            // 6. Генерируем событие ввода, чтобы сразу сработал расчет наград (updateRewardCalc)
+            input.dispatchEvent(new Event('input'));
+        }
+
+    } catch (e) {
+        console.error("Error fetching MIRTA balance:", e);
     }
 }
 

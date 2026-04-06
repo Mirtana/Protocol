@@ -10,6 +10,17 @@ const CONTRACT_CONFIG = {
         SWAP_ADDRESS: "0xEf2EA09A748348f1D7e2D8ebF8534540FB0a21f1",
         explorerUrl: "https://explorer.testnet.chain.robinhood.com"
     },
+
+    5042002: {
+        networkName: "Arc Testnet",
+        nativeTicker: "USDC", 
+        MIRTA: "0xad4d6Ed80F18768a1DdE5f2b6a97a900A5C874e1",
+        SWAP_ADDRESS: "0x6935CF14a5F318Effd758D3d9454336134323383",
+        explorerUrl: "https://testnet.arcscan.app",
+        chainIdHex: '0x4cef52',
+        rpcUrl: 'https://rpc.testnet.arc.network'
+    },
+
     11155111: {
         networkName: "Sepolia",
         nativeTicker: "ETH",
@@ -53,6 +64,7 @@ async function connect() {
             await updateBalances();
             await updateMintProgress();
             await initSwap();
+            await checkGMStatus();
         }
           
         window.ethereum.on('accountsChanged', () => window.location.reload());
@@ -64,11 +76,18 @@ async function connect() {
 function setupContracts(chainId, signerOrProvider) {
     const config = CONTRACT_CONFIG[Number(chainId)];
     if (!config) {
-        alert("Switch to Robinhood or Sepolia network!");
+        triggerModal("Wrong Network", "Please switch to Robinhood or Arc Network!", "error");
         return false;
     }
-    MIRTAContract = new ethers.Contract(config.MIRTA, MIRTA_ABI, signerOrProvider);
-    return true;
+
+    // Проверяем наличие адреса, чтобы ethers не выдал ошибку INVALID_ARGUMENT
+    if (config.MIRTA && config.MIRTA !== "0x0000000000000000000000000000000000000000") {
+        MIRTAContract = new ethers.Contract(config.MIRTA, MIRTA_ABI, signerOrProvider);
+        return true;
+    } else {
+        console.warn("MIRTA Contract not deployed on this network yet.");
+        return false; 
+    }
 }
 
 /** Функция инициализации при загрузке страницы */
@@ -83,6 +102,8 @@ async function init() {
         }
     }
 }
+
+
 
 // ==========================================
 // 3. ПОЛУЧЕНИЕ ДАННЫХ И ОБНОВЛЕНИЕ UI
@@ -175,6 +196,9 @@ async function syncNetworkDisplay() {
     }
 }
 
+
+
+
 // ==========================================
 // 4. ЛОГИКА МИНТА И КАЛЬКУЛЯТОРА
 // ==========================================
@@ -204,6 +228,40 @@ async function mintToken() {
     }
 }
 
+async function setMaxMint() {
+    if (!signer || !userAccount) {
+        console.error("Wallet not connected");
+        return;
+    }
+
+    try {
+        
+        const balance = await provider.getBalance(userAccount);
+        
+        const gasReserve = ethers.parseEther("0.001");
+
+        let finalAmount;
+        if (balance > gasReserve) {
+            finalAmount = balance - gasReserve;
+        } else {
+            finalAmount = 0n;
+        }
+
+        const formatted = ethers.formatEther(finalAmount);
+        
+        const input = document.getElementById('mintAmountEth');
+        
+        if (input) {
+            input.value = formatted;
+            
+            input.dispatchEvent(new Event('input'));
+        }
+
+    } catch (e) {
+        console.error("Error setting max balance:", e);
+    }
+}
+
 /** Добавляет токен MIRTA в список активов кошелька пользователя */
 async function addTokenToWallet() {
     const chainId = Number(await window.ethereum.request({ method: 'eth_chainId' }));
@@ -225,6 +283,9 @@ async function addTokenToWallet() {
         });
     } catch (error) { console.error("Ошибка при добавлении токена:", error); }
 }
+
+
+
 
 // ==========================================
 // 5. МОДАЛЬНЫЕ ОКНА И UI ВЗАИМОДЕЙСТВИЕ
@@ -275,6 +336,9 @@ function closeModal() {
     document.getElementById('txModal').classList.add('hidden');
 }
 
+
+
+
 // ==========================================
 // 6. СЛУШАТЕЛИ И ОБРАБОТЧИКИ СОБЫТИЙ
 // ==========================================
@@ -313,32 +377,50 @@ if (networkList) {
         e.preventDefault();
         networkList.classList.remove('show');
 
-        let chainId = target.getAttribute('data-chain-id');
-        if (!chainId.startsWith('0x')) chainId = '0x' + parseInt(chainId).toString(16);
+        const chainId = target.getAttribute('data-chain-id');
+        await switchNetwork(chainId); // Вызываем нашу новую функцию
+    };
+}
 
-        try {
-            await window.ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: chainId }],
-            });
-        } catch (switchError) {
-            if (switchError.code === 4902 || switchError.code === -32603) {
-                const config = CONTRACT_CONFIG[46630];
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0xb626',
-                            chainName: config.networkName,
-                            rpcUrls: ["https://rpc.testnet.chain.robinhood.com"],
-                            nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-                            blockExplorerUrls: [config.explorerUrl]
-                        }]
-                    });
-                } catch (addError) { console.error("User rejected network add"); }
+// Исправленная универсальная функция переключения
+async function switchNetwork(targetChainId) {
+    const config = CONTRACT_CONFIG[Number(targetChainId)];
+    if (!config) {
+        console.error("Network configuration not found for ID:", targetChainId);
+        return;
+    }
+
+    const hexChainId = config.chainIdHex || '0x' + Number(targetChainId).toString(16);
+
+    try {
+        // 1. Пытаемся просто переключить
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: hexChainId }],
+        });
+    } catch (switchError) {
+        // 2. Если сети нет в кошельке (ошибка 4902), предлагаем добавить
+        if (switchError.code === 4902 || switchError.code === -32603) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: hexChainId,
+                        chainName: config.networkName,
+                        rpcUrls: [config.rpcUrl],
+                        nativeCurrency: { 
+                            name: config.nativeTicker, 
+                            symbol: config.nativeTicker, 
+                            decimals: 18 
+                        },
+                        blockExplorerUrls: [config.explorerUrl]
+                    }]
+                });
+            } catch (addError) {
+                console.error("User rejected adding the network");
             }
         }
-    };
+    }
 }
 
 // Запуск инициализации при загрузке
@@ -346,3 +428,62 @@ window.addEventListener('load', init);
 
 // Закрытие выпадающего списка при клике в любое место
 window.onclick = () => { if(networkList) networkList.classList.remove('show'); };
+
+
+function showSection(sectionId, element) {
+    // 1. Находим все блоки контента и скрываем их
+    const sections = document.querySelectorAll('.tab-content');
+    sections.forEach(sec => {
+        sec.classList.remove('active');
+    });
+
+    // 2. Убираем подсветку у всех кнопок навигации
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // 3. Показываем тот блок, на который нажали
+    const activeSection = document.getElementById(sectionId);
+    if (activeSection) {
+        activeSection.classList.add('active');
+    }
+
+    // 4. Подсвечиваем нажатую кнопку
+    element.classList.add('active');
+
+    if (sectionId === 'TokenFactory-section') {
+        console.log("Switching to Factory: Loading tokens...");
+        loadUserTokens();
+    }
+}
+
+function triggerModal(title, message, type = 'info') {
+    // 1. Сначала открываем модалку, используя твою функцию
+    if (typeof showGMProcessingModal === "function") {
+        showGMProcessingModal(true); 
+    } else {
+        const statusModal = document.getElementById('statusModal');
+        if (statusModal) statusModal.style.display = 'flex';
+    }
+
+    // 2. Делаем небольшую задержку (0.1 сек), чтобы твой старый код 
+    // успел отработать, а мы ПЕРЕКРЫЛИ его текст своим
+    setTimeout(() => {
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        
+        if (modalTitle && modalDesc) {
+            // Подставляем наш текст (например, "Empty Fields")
+            modalTitle.innerText = title;
+            modalDesc.innerText = message;
+
+            // Стилизация цвета
+            if (type === 'error') {
+                modalTitle.style.color = "#ff4a4a"; // Красный для ошибок
+            } else {
+                modalTitle.style.color = "#00f2ff"; // Твой фирменный неон
+            }
+        }
+    }, 100); 
+}

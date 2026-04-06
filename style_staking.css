@@ -157,6 +157,12 @@
 
 /* Адаптивность для мобилок */
 @media (max-width: 600px) {
+
+     .glass-card{
+        text-align: center;
+        padding: 50px;
+        margin: 10px;
+    }
     .active-stake-card {
         flex-direction: column;
         align-items: flex-start;

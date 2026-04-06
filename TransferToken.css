@@ -1,0 +1,120 @@
+/* Основная карточка трансфера */
+.transfer-card {
+    background: rgba(0, 0, 0, 0.178);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(12px);
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: center; /* Центрируем заголовки внутри карточки */
+}
+
+/* Общие стили для инпутов */
+input {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    outline: none;
+}
+
+
+/* Убираем стрелочки (spin-buttons) у числовых инпутов, чтобы текст не смещался */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+/* 
+/* Контейнер ввода в стиле Web3 */
+.web3-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #0d1117; 
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    margin-top: 8px;
+    
+    height: 50px; /* Фиксированная высота для центровки */
+    transition: border-color 0.2s;
+    overflow: hidden;
+}
+
+.web3-input:focus-within {
+    border-color: #00f2ff;
+}
+
+.web3-input input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 0 16px; /* Равномерный отступ слева */
+    flex-grow: 1;
+    width: 100%;
+    font-size: 1rem;
+    height: 100%;
+    line-height: 1; /* Гарантирует вертикальную центровку текста */
+    display: flex;
+    align-items: center;
+}
+
+/* Кнопка MAX внутри инпута */
+.max-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #00f2ff;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    height: 24px; /* Компактная высота */
+    padding: 0 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-right: 12px;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.max-badge:hover {
+    box-shadow: 0 0 12px rgba(0, 242, 255, 0.6);
+    transform: scale(1.05);
+}
+
+/* Текст MIRTA и акценты */
+.cyan-text {
+    color: #00f2ff;
+    text-shadow: 0 0 8px rgba(0, 242, 255, 0.4);
+}
+
+/* Главная кнопка SEND */
+.main-btn {
+    display: inline-flex; /* Позволяет центрировать текст внутри и саму кнопку снаружи */
+    align-items: center;
+    justify-content: center;
+    width: 220px; 
+    height: 48px;
+    margin: 20px auto 0;
+    background: #00f2ff;
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 242, 255, 0.2);
+}
+
+.main-btn:hover {
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.main-btn:active {
+    transform: translateY(0);
+}

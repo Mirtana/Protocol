@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="modal_style.css">
     <link rel="stylesheet" href="style_staking.css">
     <link rel="stylesheet" href="swap_style.css">
+    <link rel="stylesheet" href="style_sub-nav.css">
+    <link rel="stylesheet" href="TokenFactory.css">
+    <link rel="stylesheet" href="TransferToken.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
-
-    
-   
 
 </head>
 
@@ -23,6 +23,7 @@
 
 
     <header class="header">
+
         <div class="header-left">
 
             <img src="MIRTAlogo.png" alt="Mirtana" class="logo">
@@ -51,7 +52,7 @@
                 <div class="dropdown-content" id="network-list">
 
                     <a href="#" data-chain-id="0xb626">Robinhood</a> 
-                    <a href="#" data-chain-id="0xaa36a7">Sepolia</a>
+                    <a href="#" data-chain-id="0x4cef52">Arc Testnet</a>
 
                 
                 </div>
@@ -59,97 +60,113 @@
 
             <button id="connect-btn" class="connect-button"><i class="fas fa-wallet"></i> Connect Wallet</button>
         </div>
+        
     </header>
 
+    <nav class="sub-nav">
+     <button class="nav-item active" onclick="showSection('gm-section', this)">GM</button>
+     <button class="nav-item" onclick="showSection('mint-section', this)">MINT</button>
+     <button class="nav-item" onclick="showSection('swap-section', this)">SWAP</button>
+     <button class="nav-item" onclick="showSection('staking-section', this)">STAKING</button>
+
+     <button class="nav-item" onclick="showSection('TokenFactory-section', this)">Token Factory</button>
+     <button class="nav-item" onclick="showSection('TransferToken-section', this)">Send MIRTA</button>
+
+    </nav> 
+      
+      
+       
     <main class="main-content">
 
-        <section class="section-block"> 
-            
-            <div class="faucet-container">
-                <span class="faucet-label">Get Test Tokens</span>
-                <div class="faucet-links">
-                    <a href="https://faucet.testnet.chain.robinhood.com" target="_blank" class="faucet-chip">
-                        <i class="fas fa-parachute-box"></i> Robinhood
-                    </a>
-                    <a href="https://cloud.google.com/application/web3/faucet/ethereum/sepolia" target="_blank" class="faucet-chip">
-                        <i class="fas fa-parachute-box"></i> Sepolia
-                    </a>
-                </div>
-            </div>
-    
-            
-    
-            <div class="glass-card mint-card">
-
-            <h2 class="section-title">
-                TOKEN <span>MINT</span> <span class="title-icon-after">✔</span>
-            </h2>
-
-                <div class="price-info">Price: <span id="priceDisplay">...</span></div>
-                
-                <div class="progress-container">
-                    <div class="progress-label">
-                        <span id="soldPercentage">0% SOLD</span>
-                    </div>
-                    <div class="mint-stats">
-                        <span id="mintedAmount">0</span> / 
-                        <span id="maxSupplyAmount">1,000,000,000</span> MIRTA
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div id="supplyBar" class="progress-bar-fill"></div>
-                    </div>
-                </div>
-    
-                <div class="input-container">
-                    <label>You Pay</label>
-                    <div class="web3-input">
-                        <input type="number" id="mintAmountEth" placeholder="0.0">
-                        <span id="nativeTickerInput" class="token-tag" style="margin-right: 12px;">NATIVE</span>
-                        <button class="max-badge" onclick="setMaxMint()">MAX</button>
-                    </div>
-                </div>
-    
-                <div class="result-calc">
-                    You Receive: <strong id="calcOutput">0 MIRTA</strong>
-                </div>
-    
-                <button id="mintBtn" class="action-btn centered-btn" onclick="mintToken()" disabled>
-                    <span id="mintBtnText">CONNECT WALLET</span>
-                </button>
-                
-                <button class="add-token-btn" onclick="addTokenToWallet()">+ Add MIRTA to Metamask</button>
-            </div>
-        </section> 
-        
-        <section class="swap-section">
-    <div class="swap-card">
-        <h3>SWAP <span class="highlight">MIRTA</span> to <span class="highlight">ETH</span></h3>
-        <p class="swap-price-info">Current Buyback Price: <span id="currentBuybackPrice">0.00...</span> ETH</p>
-        
-        <div class="input-group">
-            <label>You Sell</label>
-            <div class="input-wrapper">
-                <input type="number" id="swapAmountMirta" placeholder="0.0" oninput="updateSwapReturn()">
-                <span class="token-symbol">MIRTA</span>
+    <section class="section-block"> 
+        <div class="faucet-container">
+            <span class="faucet-label">Get Test Tokens</span>
+            <div class="faucet-links">
+                <a href="https://faucet.testnet.chain.robinhood.com" target="_blank" class="faucet-chip">
+                    <i class="fas fa-parachute-box"></i> Robinhood Faucet
+                </a>
+                <!-- <a href="https://cloud.google.com/application/web3/faucet/ethereum/sepolia" target="_blank" class="faucet-chip">
+                    <i class="fa-brands fa-ethereum"></i> Sepolia
+                </a> -->
             </div>
         </div>
+    </section>
 
-        <div class="swap-arrow">↓</div>
-
-        <div class="input-group">
-            <label>You Receive (Estimate)</label>
-            <div class="input-wrapper readonly">
-                <input type="text" id="ethReceiveEstimate" placeholder="0.0" readonly>
-                <span class="token-symbol">ETH</span>
+    <div id="gm-section" class="tab-content active">
+        <div class="glass-card mint-card">
+            <div class="section-title">DAILY <span>ACTIVITY</span></div>
+            <div class="mint-stats">Total GM: <span id="userGmCount">0</span></div>
+            <div id="gmTimerText" style="text-align: center; color: rgba(255,255,255,0.6); margin: 10px 0;">
+                Checking status...
             </div>
+            <button id="gmBtn" class="action-btn" onclick="handleGM()">
+                <span id="gmBtnText">SAY GM!</span>
+            </button>
         </div>
-
-        <button class="mint-btn" id="swapBtn" onclick="swapMirta()">SWAP NOW</button>
-        <p class="swap-hint">* Required MIRTA Approval before swapping</p>
     </div>
-        </section>
 
-        <section class="section-block">
+    <div id="mint-section" class="tab-content">
+        <div class="glass-card_mint mint-card">
+            <h2 class="section-title">TOKEN <span>MINT</span> <span class="title-icon-after">✔</span></h2>
+            <div class="price-info">Price: <span id="priceDisplay">...</span></div>
+            
+            <div class="progress-container">
+                <div class="progress-label"><span id="soldPercentage">0% SOLD</span></div>
+                <div class="mint-stats">
+                    <span id="mintedAmount">0</span> / <span id="maxSupplyAmount">1,000,000,000</span> MIRTA
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="supplyBar" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <label>You Pay</label>
+                <div class="web3-input">
+                    <input type="number" id="mintAmountEth" placeholder="0.0">
+                    <span id="nativeTickerInput" class="token-tag" style="margin-right: 12px;">NATIVE</span>
+                    <button class="max-badge" onclick="setMaxMint()">MAX</button>
+                </div>
+            </div>
+
+            <div class="result-calc">You Receive: <strong id="calcOutput">0 MIRTA</strong></div>
+
+            <button id="mintBtn" class="action-btn centered-btn" onclick="mintToken()" disabled>
+                <span id="mintBtnText">CONNECT WALLET</span>
+            </button>
+            <button class="add-token-btn" onclick="addTokenToWallet()">+ Add MIRTA to Metamask</button>
+        </div>
+    </div>
+
+    <div id="swap-section" class="tab-content">
+        <section class="swap-section" style="width: 100%; display: flex; justify-content: center;">
+            <div class="swap-card">
+                <h3>SWAP <span class="highlight">MIRTA</span> to <span class="highlight">ETH</span></h3>
+                <p class="swap-price-info">Current Buyback Price: <span id="currentBuybackPrice">0.00...</span> ETH</p>
+                
+                <div class="input-group">
+                    <label>You Sell</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="swapAmountMirta"  placeholder="0.0" oninput="updateSwapReturn()">
+                        <span class="token-symbol">MIRTA</span>
+                    </div>
+                </div>
+                <div class="swap-arrow">↓</div>
+                <div class="input-group">
+                    <label>You Receive (Estimate)</label>
+                    <div class="input-wrapper readonly">
+                        <input type="text" id="ethReceiveEstimate" placeholder="0.0" readonly>
+                        <span class="token-symbol">ETH</span>
+                    </div>
+                </div>
+                <button class="mint-btn" id="swapBtn" onclick="swapMirta()">SWAP NOW</button>
+                <p class="swap-hint">* Required MIRTA Approval before swapping</p>
+            </div>
+        </section>
+    </div>
+
+    <div id="staking-section" class="tab-content">
+        <section class="section-block" style="width: 100%;">
             <div class="staking-layout">
                 <div class="glass-card">
                     <h2 class="section-title">STAKING <span>DASHBOARD</span></h2>
@@ -165,7 +182,6 @@
                             ~<span id="calculatedReward">0.00</span> MIRTA Reward
                         </div>
                     </div>
-                    
                     <button class="action-btn centered-btn" onclick="stakeTokens()">STAKE NOW</button>
                 </div>
         
@@ -177,8 +193,101 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <div id="TokenFactory-section" class="tab-content">
+
+        <div class="factory-container">
+            <div class="factory-card create-panel">
+                <div class="card-header">
+                    <i class="fas fa-hammer neon-text"></i>
+                    <h2>Token Generator</h2>
+                </div>
+                
+                <div class="input-group">
+                    <label>Token Name</label>
+                    <input type="text" id="tokenName" placeholder="Example: Bitcoin">
+                </div>
+        
+                <div class="input-group">
+                    <label>Token Symbol</label>
+                    <input type="text" id="tokenSymbol" placeholder="Example: BTC">
+                </div>
+        
+                <div class="input-group">
+                    <label>Total Supply</label>
+                    <input type="number" id="tokenSupply" placeholder="Example: 21000000">
+                </div>
+        
+                <div class="input-group">
+                    <label>Token Type</label>
+                    <div class="token-type-selector">
+                        <div class="type-option active" onclick="selectTokenType(0, this)">
+                            <i class="fas fa-coins"></i>
+                            <span>Standard</span>
+                        </div>
+                        <div class="type-option" onclick="selectTokenType(1, this)">
+                            <i class="fas fa-fire"></i>
+                            <span>Burnable</span>
+                        </div>
+                        <div class="type-option" onclick="selectTokenType(2, this)">
+                            <i class="fas fa-percent"></i>
+                            <span>Tax (5%)</span>
+                        </div>
+                    </div>
+                </div>
+        
+                <button class="deploy-btn" onclick="deployToken()">
+                    <i class="fas fa-rocket"></i> DEPLOY TOKEN
+                </button>
+            </div>
+        
+            <div class="factory-card tokens-panel">
+                <div class="card-header">
+                    <i class="fas fa-list-ul neon-text"></i>
+                    <h2>My Created Tokens</h2>
+                    <button class="refresh-btn" onclick="loadUserTokens()"><i class="fas fa-sync-alt"></i></button>
+                </div>
+                
+                <div id="userTokensList" class="tokens-grid">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>No tokens found yet...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="TransferToken-section" class="tab-content">
+
+        <div class="transfer-card web3-panel mt-25">
+            <h3>SEND <span class="cyan-text">MIRTA</span></h3>
+            <p class="panel-desc">Transfer tokens to another wallet address</p>
+        
+            <div class="input-container">
+                <label>Recipient Address</label>
+                <div class="web3-input">
+                    <input type="text" id="transferAddress" placeholder="0x...">
+                </div>
+            </div>
+        
+            <div class="input-container mt-15">
+                <label>Amount to Send</label>
+                <div class="web3-input">
+                    <input type="number" id="transferAmount" placeholder="0.0">
+                    <button class="max-badge" onclick="setMaxTransfer()">MAX</button>
+                </div>
+            </div>
+        
+            <button class="main-btn mt-25" onclick="sendMirtaTokens()">SEND NOW</button>
+        </div>
+
+    </div>
+
     </main>
-    
+
     <footer class="footer">
         <div class="container footer-content">
             <p class="copyright">© 2026 Mirtana Protocol. Built for Robinhood Chain Testnet.</p>
@@ -187,10 +296,10 @@
                 <a href="https://t.me/mirtanaprotocol" target="_blank"><i class="fab fa-telegram"></i></a>
                 <a href="https://discord.gg/SdwEBqRrQj" target="_blank"><i class="fab fa-discord"></i></a>
                 <a href="https://github.com/Mirtana/Protocol.git" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="https://explorer.testnet.chain.robinhood.com/" target="_blank"><i class="fa-solid fa-parachute-box"></i></a>
             </div>
         </div>
     </footer>
-
 
     <div id="txModal" class="modal-overlay hidden">
         <div class="modal-contentmint">
@@ -204,8 +313,6 @@
         </div>
     </div>
 
-
-    
     <div id="statusModal" class="modal" style="display: none;">
         <div class="modal-content status-content">
             <span class="close-modal" onclick="closeStatusModal()">&times;</span>
@@ -228,15 +335,24 @@
     </div>
 
 
-    <script src="app-connect.js"></script>
 
     <canvas id="circuitCanvas"></canvas>
+
+    <script src="app-connect.js"></script>
+
+    <script src="DailyGM.js"></script>
 
     <script src="background.js"></script>
 
     <script src="staking.js"></script>
 
     <script src="swap.js"></script>
+    
+    <script src="TokenFactory.js"></script>
+    
+    <script src="Transfer_MIRTA.js"></script>
+
+
 
 </body>
 </html>

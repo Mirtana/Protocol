@@ -13,7 +13,7 @@ async function initSwap() {
         if (swapAddress && swapAddress !== "0x0000000000000000000000000000000000000000") {
             // Используем глобальный signer из твоего app-connect.js
             swapContract = new ethers.Contract(swapAddress, SWAP_ABI, signer);
-            console.log(`Swap Contract initialized on chain ${chainId}`);
+            
             await fetchSwapPrice(); // Сразу подтягиваем цену
         } else {
             console.warn("Swap address not found for this network");

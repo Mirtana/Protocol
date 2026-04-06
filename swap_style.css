@@ -4,7 +4,7 @@
     width: 100%;           
     padding: 0 10px;       
     box-sizing: border-box; 
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 .swap-card {
@@ -13,9 +13,9 @@
     border-radius: 20px;
     backdrop-filter: blur(12px);
     box-sizing: border-box;
-    padding: 30px;
+    padding: 10px;
     width: 100%;           
-    max-width: 785px;      
+    max-width: 400px;      
     gap: 15px;
     transition: all 0.3s ease;
 }
@@ -47,33 +47,39 @@
 .input-wrapper {
     width: 100%;
     box-sizing: border-box;
-    background: #1a1d23;
-    border: 1px solid #333;
+    background: #000000;
+    /* border: 1px solid #333; */
     border-radius: 12px;
     display: flex;
-    padding: 10px 15px;
+    
     transition: 0.3s;
     
 }
 
 .input-wrapper:focus-within {
-    border-color: #00f2ff;
-    box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+    border-color: #00f2ff00;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.308);
 }
 
 .input-wrapper input {
     background: transparent;
     border: none;
-    color: #fff;
+    color: #ffffff;
     width: 100%;
     font-size: 1.1rem;
     outline: none;
 }
 
 .token-symbol {
+    line-height: 1; 
+    display: flex;
+    align-items: center;
+    padding: 5px;
     color: #00f2ff;
     font-weight: bold;
     font-size: 0.9rem;
+    
+    
 }
 
 .swap-arrow {
@@ -91,7 +97,7 @@
 }
 
 #swapBtn {
-    width: 100%;
+    width: 200px;
     max-width: 100%;   
     box-sizing: border-box;       
     display: block;         
@@ -99,14 +105,14 @@
     background: #00f2ff;
     color: #000;
     border: none;
-    padding: 15px;
+    padding: 12px 24px;
     border-radius: 12px;
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     text-transform: uppercase;
-    box-shadow: 0 0 15px rgba(0, 242, 255, 0.4);
+    
     
 }
 

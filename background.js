@@ -2,14 +2,13 @@ const canvas = document.getElementById('circuitCanvas');
 const ctx = canvas.getContext('2d');
 
 let width, height, particles = [];
-let mouse = { x: null, y: null, radius: 150 };
+let mouse = { x: null, y: null, radius: 200 };
 
 const SETTINGS = {
-    particleCount: 50,    // Количество узлов (не делай больше 120 для скорости)
-    maxDistance: 160,    // Расстояние, при котором появляется связь
-    particleSize: 1.5,   // Размер точки
-    lineOpacity: 0.25,   // Максимальная яркость линий
-    speed: 0.3           // Скорость движения
+    particleCount: 80,    // Теперь можно больше, так как код стал легче
+    particleSize: 2,
+    speed: 0.3,
+    
 };
 
 function setCanvasSize() {
@@ -19,30 +18,49 @@ function setCanvasSize() {
 
 class Particle {
     constructor() {
+        this.init();
+    }
+
+    init() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * SETTINGS.speed;
-        this.vy = (Math.random() - 0.5) * SETTINGS.speed;
-        this.radius = Math.random() * SETTINGS.particleSize + 1;
+        // Разная скорость для эффекта параллакса (глубины)
+        this.z = Math.random() * 1 + 0.2; 
+        this.vx = (Math.random() - 0.5) * SETTINGS.speed * this.z;
+        this.vy = (Math.random() - 0.5) * SETTINGS.speed * this.z;
+        this.radius = Math.random() * SETTINGS.particleSize * this.z;
+        this.alpha = Math.random() * 0.5 + 0.1;
     }
 
     update() {
-        // Движение
         this.x += this.vx;
         this.y += this.vy;
 
-        // Отскок от краев экрана
-        if (this.x < 0 || this.x > width) this.vx *= -1;
-        if (this.y < 0 || this.y > height) this.vy *= -1;
+        // Бесконечный цикл (вылетают с другой стороны)
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
 
-        // Взаимодействие с мышью (легкое притяжение)
+        // Взаимодействие с мышью
         if (mouse.x !== null) {
             let dx = mouse.x - this.x;
             let dy = mouse.y - this.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < mouse.radius) {
-                this.x += dx * 0.0015;
-                this.y += dy * 0.0015;
+            let dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < mouse.radius) {
+                // Рисуем линию только если мышь рядом (очень быстро для процессора)
+                let opacity = 1 - (dist / mouse.radius);
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(0, 242, 255, ${opacity * 0.4})`;
+                ctx.lineWidth = 0.5;
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(mouse.x, mouse.y);
+                ctx.stroke();
+                
+                // Легкое притяжение
+                this.x += dx * 0.002;
+                this.y += dy * 0.002;
             }
         }
     }
@@ -50,7 +68,9 @@ class Particle {
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#00f2ff';
+        ctx.fillStyle = `rgba(0, 242, 255, ${this.alpha})`;
+        ctx.shadowBlur = this.z * 5; // Небольшое свечение для "дальних" точек
+        ctx.shadowColor = SETTINGS.color;
         ctx.fill();
     }
 }
@@ -64,33 +84,18 @@ function init() {
 }
 
 function animate() {
-    ctx.clearRect(0, 0, width, height);
-    // Глубокий темный фон (можно задать в CSS, но здесь для надежности)
-    ctx.fillStyle = '#0b0e14';
+    // Делаем фон чуть прозрачным при очистке, чтобы оставался легкий шлейф (Motion Blur)
+    ctx.fillStyle = 'rgba(9, 10, 14, 0.2)'; 
     ctx.fillRect(0, 0, width, height);
+    
+    // Убираем тень для линий, чтобы не тормозило
+    ctx.shadowBlur = 0;
 
-    for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
+    particles.forEach(p => {
+        p.update();
+        p.draw();
+    });
 
-        // Связи между узлами
-        for (let j = i + 1; j < particles.length; j++) {
-            let dx = particles[i].x - particles[j].x;
-            let dy = particles[i].y - particles[j].y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < SETTINGS.maxDistance) {
-                // Чем ближе точки, тем ярче линия
-                let opacity = 1 - (distance / SETTINGS.maxDistance);
-                ctx.beginPath();
-                ctx.strokeStyle = `rgba(0, 242, 255, ${opacity * SETTINGS.lineOpacity})`;
-                ctx.lineWidth = 0.8;
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.stroke();
-            }
-        }
-    }
     requestAnimationFrame(animate);
 }
 
