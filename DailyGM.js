@@ -130,26 +130,42 @@ function showGMProcessingModal(isFactory = false) {
     const modal = document.getElementById('txModal');
     if (!modal) return;
 
-    // Меняем текст в зависимости от того, что делаем
-    document.getElementById('modalTitle').innerText = isFactory ? "Deploying Token..." : "Sending Transaction...";
+    // --- БЛОК СБРОСА (Fix для повторного вызова) ---
+    // Скрываем и удаляем инлайновые стили перед новым показом
+    modal.classList.add('hidden');
+    modal.style.removeProperty('display');
     
-    // Вставляем новый SVG-спиннер с классом neon-spinner
-    document.getElementById('modalIcon').innerHTML = `
-        <div class="neon-spinner">
-            <svg viewBox="0 0 50 50">
-                <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-            </svg>
-        </div>`;
+    // Используем небольшую задержку, чтобы DOM успел обновить состояние
+    setTimeout(() => {
+        // Меняем текст в зависимости от того, что делаем
+        const titleElem = document.getElementById('modalTitle');
+        const iconElem = document.getElementById('modalIcon');
+        const descElem = document.getElementById('modalDesc');
+        const linkElem = document.getElementById('modalLinkHolder');
 
-    const desc = isFactory 
-        ? "Creating your smart contract... Please confirm in wallet." 
-        : "Processing your GM... Please confirm in wallet.";
+        if (titleElem) titleElem.innerText = isFactory ? "Deploying Token..." : "Sending Transaction...";
         
-    document.getElementById('modalDesc').innerHTML = `<p style="color: rgba(255,255,255,0.7);">${desc}</p>`;
-    document.getElementById('modalLinkHolder').innerHTML = "";
+        // Вставляем новый SVG-спиннер с классом neon-spinner
+        if (iconElem) {
+            iconElem.innerHTML = `
+                <div class="neon-spinner">
+                    <svg viewBox="0 0 50 50">
+                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                </div>`;
+        }
 
-    modal.classList.remove('hidden'); 
-    modal.style.setProperty('display', 'flex', 'important');
+        const desc = isFactory 
+            ? "Creating your smart contract... Please confirm in wallet." 
+            : "Processing your transaction... Please confirm in wallet.";
+            
+        if (descElem) descElem.innerHTML = `<p style="color: rgba(255,255,255,0.7);">${desc}</p>`;
+        if (linkElem) linkElem.innerHTML = "";
+
+        // Принудительно отображаем модалку
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.classList.remove('hidden');
+    }, 10); 
 }
 
 function showGMSuccessModal(hash, url, isFactory = false) {
@@ -178,6 +194,15 @@ function showGMSuccessModal(hash, url, isFactory = false) {
 
     modal.classList.remove('hidden'); 
     modal.style.setProperty('display', 'flex', 'important');
+}
+
+function closeModal() {
+    const modal = document.getElementById('txModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        // Обязательно удаляем инлайновый стиль, который добавили через JS
+        modal.style.removeProperty('display'); 
+    }
 }
 
 async function initGMContract() {

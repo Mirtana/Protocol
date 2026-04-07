@@ -14,13 +14,16 @@
     <link rel="stylesheet" href="style_sub-nav.css">
     <link rel="stylesheet" href="TokenFactory.css">
     <link rel="stylesheet" href="TransferToken.css">
+    <link rel="stylesheet" href="ATTENTION.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 </head>
 
 <body>
 
+  
 
     <header class="header">
 
@@ -60,6 +63,7 @@
 
             <button id="connect-btn" class="connect-button"><i class="fas fa-wallet"></i> Connect Wallet</button>
         </div>
+        
         
     </header>
 
@@ -288,15 +292,26 @@
 
     </main>
 
+
+    <div class="testnet-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>
+            <strong>ATTENTION:</strong> All contracts are deployed on <strong>Testnet</strong>. 
+            MIRTA tokens have <strong>no real-world value</strong> and are for testing purposes only.
+        </span>
+    </div>
+
+
     <footer class="footer">
         <div class="container footer-content">
             <p class="copyright">© 2026 Mirtana Protocol. Built for Robinhood Chain Testnet.</p>
             <div class="social-links">
-                <a href="https://x.com/MirtanaProtocol" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="https://x.com/MirtanaProtocol" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
                 <a href="https://t.me/mirtanaprotocol" target="_blank"><i class="fab fa-telegram"></i></a>
                 <a href="https://discord.gg/SdwEBqRrQj" target="_blank"><i class="fab fa-discord"></i></a>
                 <a href="https://github.com/Mirtana/Protocol.git" target="_blank"><i class="fab fa-github"></i></a>
                 <a href="https://explorer.testnet.chain.robinhood.com/" target="_blank"><i class="fa-solid fa-parachute-box"></i></a>
+                <a href="https://testnet.arcscan.app/" target="_blank"><i class="fa-brands fa-airbnb"></i></a>
             </div>
         </div>
     </footer>

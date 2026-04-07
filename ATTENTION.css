@@ -1,0 +1,46 @@
+.testnet-warning {
+    background: rgba(0, 242, 255, 0.05); /* Твой основной цвет с низкой прозрачностью */
+    border: 1px solid rgba(0, 242, 255, 0.3);
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin: 20px auto;
+    max-width: 800px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #00f2ff; /* Твой неоновый голубой */
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    backdrop-filter: blur(10px); /* Эффект стекла, как в твоем Mint/Swap */
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+    animation: pulse-warning 3s infinite ease-in-out;
+}
+
+.testnet-warning i {
+    font-size: 18px;
+    color: #ffcc00; /* Янтарный цвет для иконки внимания */
+    filter: drop-shadow(0 0 5px #ffcc00);
+}
+
+.testnet-warning strong {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+/* Мягкая пульсация рамки для привлечения внимания */
+@keyframes pulse-warning {
+    0% { box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); border-color: rgba(0, 242, 255, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 242, 255, 0.2); border-color: rgba(0, 242, 255, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(0, 242, 255, 0.1); border-color: rgba(0, 242, 255, 0.3); }
+}
+
+/* Мобильная адаптация */
+@media (max-width: 600px) {
+    .testnet-warning {
+        margin: 10px;
+        font-size: 12px;
+        padding: 10px;
+    }
+}

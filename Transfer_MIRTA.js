@@ -66,21 +66,39 @@ async function sendMirtaTokens() {
         const decimals = await contract.decimals();
         const parsedAmount = ethers.parseUnits(amount, decimals);
 
-        // Показываем модалку загрузки
-        showGMProcessingModal(true); 
+        // 1. Показываем модалку загрузки
+        showGMProcessingModal(false); 
+        
+        
+        const modalBtn = document.getElementById('modalCloseBtn');
+        if (modalBtn) modalBtn.style.display = 'none'; 
+        
         document.getElementById('modalTitle').innerText = "Sending MIRTA...";
-        document.getElementById('modalDesc').innerText = `Transferring ${amount} to ${recipient.substring(0,6)}...`;
+        document.getElementById('modalDesc').innerText = `Transferring ${amount} MIRTA to ${recipient.substring(0,6)}...`;
 
+        // 2. Отправка транзакции в кошелек
         const tx = await contract.transfer(recipient, parsedAmount);
+        
+        // Меняем текст, пока ждем подтверждения в блокчейне
+        document.getElementById('modalDesc').innerText = "Transaction sent. Waiting for confirmation...";
+
+        // 3. Ожидание майнинга блока
         await tx.wait();
 
-        // Показываем успех с правильным хешем и ссылкой на эксплорер текущей сети
+        // 4. Показываем успех
         const scanUrl = `${config.explorer}${tx.hash}`;
         showGMSuccessModal(tx.hash, scanUrl);
         
+        // Настраиваем финальный вид
         document.getElementById('modalTitle').innerText = "Transfer Complete!";
-        document.getElementById('modalDesc').innerText = "Tokens sent successfully.";
+        document.getElementById('modalDesc').innerText = `Successfully sent ${amount} MIRTA.`;
         
+        // Показываем кнопку ОК только теперь
+        if (modalBtn) modalBtn.style.display = 'block';
+
+        // Обновляем балансы в интерфейсе после перевода
+        if (typeof updateBalances === 'function') updateBalances();
+
     } catch (e) {
         console.error("Transfer failed", e);
         closeModal(); 

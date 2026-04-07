@@ -300,40 +300,60 @@ function openModal(type, message, txHash = null) {
     const title = document.getElementById('modalTitle');
     const closeBtn = document.getElementById('modalCloseBtn');
 
-    modal.classList.remove('hidden');
-    linkHolder.innerHTML = ''; 
+    if (!modal) return;
 
-    const chainId = Number(window.ethereum.chainId);
-    const config = CONTRACT_CONFIG[chainId];
+    // 1. ПРИНУДИТЕЛЬНЫЙ СБРОС (Ключ к решению проблемы)
+    modal.classList.add('hidden'); // Сначала скрываем
+    modal.style.display = 'none';   // Убираем из потока
+    void modal.offsetWidth;         // ФОРСИРУЕМ ПЕРЕРИСОВКУ (Reflow) браузера
+
+    // 2. Очистка и настройка данных
+    linkHolder.innerHTML = ''; 
+    const chainId = window.ethereum ? Number(window.ethereum.chainId) : null;
+    const config = chainId ? CONTRACT_CONFIG[chainId] : null;
     const explorerUrl = config ? config.explorerUrl : "";
 
     if (type === 'loading') {
         title.innerText = "Processing...";
-        icon.innerHTML = '<i class="fas fa-spinner loading-icon"></i>';
+        icon.innerHTML = '<i class="fas fa-spinner loading-icon fa-spin"></i>'; // Добавил fa-spin для вращения
         desc.innerText = message;
         closeBtn.style.display = 'none';
     } 
     else if (type === 'success') {
         title.innerText = "Success!";
-        icon.innerHTML = '<i class="fas fa-check-circle" style="color: #00ff88;"></i>';
+        icon.innerHTML = '<i class="fas fa-check-circle" style="color: #00ff88; font-size: 2rem;"></i>';
         desc.innerText = message;
         closeBtn.style.display = 'block';
     } 
     else if (type === 'error') {
         title.innerText = "Error";
-        icon.innerHTML = '<i class="fas fa-times-circle" style="color: #ff4d4d;"></i>';
+        icon.innerHTML = '<i class="fas fa-times-circle" style="color: #ff4d4d; font-size: 2rem;"></i>';
         desc.innerText = message;
         closeBtn.style.display = 'block';
     }
 
     if (txHash && explorerUrl) {
-        linkHolder.innerHTML = `<a href="${explorerUrl}/tx/${txHash}" target="_blank">View on Explorer <i class="fas fa-external-link-alt"></i></a>`;
+        linkHolder.innerHTML = `<a href="${explorerUrl}/tx/${txHash}" target="_blank" style="color: #00f2ff; text-decoration: none;">View on Explorer <i class="fas fa-external-link-alt"></i></a>`;
     }
+
+    // 3. ЗАПУСК ЧЕРЕЗ ТАЙМАУТ
+    // Это заставляет браузер понять, что модалка "новая"
+    setTimeout(() => {
+        modal.style.display = 'flex'; // Или то состояние, которое нужно для центрирования
+        modal.classList.remove('hidden');
+    }, 10);
 }
 
 /** Закрывает модальное окно транзакции */
 function closeModal() {
-    document.getElementById('txModal').classList.add('hidden');
+    const modal = document.getElementById('txModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        // Очищаем инлайновый стиль, чтобы не мешать следующему открытию
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300); // 300ms — если у тебя есть анимация плавного исчезновения
+    }
 }
 
 
