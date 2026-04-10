@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MirtanaProtocol</title>
-    <link rel="icon" href="data:,">
+    <title>Mirtana Protocol</title>
+    <link rel="MIRTAlogo.png" href="data:,">
 
     <link rel="stylesheet" href="style-header.css">
     <link rel="stylesheet" href="main_container_style.css">
@@ -15,9 +15,14 @@
     <link rel="stylesheet" href="TokenFactory.css">
     <link rel="stylesheet" href="TransferToken.css">
     <link rel="stylesheet" href="ATTENTION.css">
+    <link rel="stylesheet" href="nft_style.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    
 
 </head>
 
@@ -38,7 +43,7 @@
             <div id="balances" class="balances hidden">
                 <div class="balance-item">
                     
-                    <i class="fab fa-ethereum"></i> <span id="native-balance">0.00</span>
+                    <i id="native-icon" class="fab fa-ethereum"></i> <span id="native-balance">0.00</span>
 
                 </div>
                 <div class="balance-item highlight">
@@ -54,10 +59,9 @@
                 
                 <div class="dropdown-content" id="network-list">
 
-                    <a href="#" data-chain-id="0xb626">Robinhood</a> 
                     <a href="#" data-chain-id="0x4cef52">Arc Testnet</a>
-
-                
+                    <a href="#" data-chain-id="0xb626">Robinhood</a> 
+                    
                 </div>
             </div>
 
@@ -72,9 +76,10 @@
      <button class="nav-item" onclick="showSection('mint-section', this)">MINT</button>
      <button class="nav-item" onclick="showSection('swap-section', this)">SWAP</button>
      <button class="nav-item" onclick="showSection('staking-section', this)">STAKING</button>
-
-     <button class="nav-item" onclick="showSection('TokenFactory-section', this)">Token Factory</button>
      <button class="nav-item" onclick="showSection('TransferToken-section', this)">Send MIRTA</button>
+     <button class="nav-item" onclick="showSection('TokenFactory-section', this)">Create Token</button>
+     
+     <button class="nav-item" onclick="showSection('nft-mint-section', this)">NFT MINT</button>
 
     </nav> 
       
@@ -86,12 +91,15 @@
         <div class="faucet-container">
             <span class="faucet-label">Get Test Tokens</span>
             <div class="faucet-links">
-                <a href="https://faucet.testnet.chain.robinhood.com" target="_blank" class="faucet-chip">
-                    <i class="fas fa-parachute-box"></i> Robinhood Faucet
-                </a>
+                
                 <a href="https://faucet.circle.com/?_gl=1*15jfk8j*_gcl_au*MTkxNTY4MjQzNC4xNzc1NDczMDI1" target="_blank" class="faucet-chip">
                     <i class="fa-solid fa-dollar-sign"></i> Arc Network
                 </a>
+                
+                <a href="https://faucet.testnet.chain.robinhood.com" target="_blank" class="faucet-chip">
+                    <i class="fas fa-parachute-box"></i> Robinhood Faucet
+                </a>
+                
             </div>
         </div>
     </section>
@@ -138,31 +146,35 @@
             <button id="mintBtn" class="action-btn centered-btn" onclick="mintToken()" disabled>
                 <span id="mintBtnText">CONNECT WALLET</span>
             </button>
-            <button class="add-token-btn" onclick="addTokenToWallet()">+ Add MIRTA to Metamask</button>
+            <button class="add-token-btn" onclick="addTokenToWallet()">+ Add MIRTA to Wallet</button>
         </div>
     </div>
 
     <div id="swap-section" class="tab-content">
         <section class="swap-section" style="width: 100%; display: flex; justify-content: center;">
             <div class="swap-card">
-                <h3>SWAP <span class="highlight">MIRTA</span> to <span class="highlight">ETH</span></h3>
-                <p class="swap-price-info">Current Buyback Price: <span id="currentBuybackPrice">0.00...</span> ETH</p>
+                <h3>SWAP <span class="highlight">MIRTA</span> to <span class="highlight" id="swapTitleSymbol">ETH</span></h3>
+                
+                <p class="swap-price-info">Current Buyback Price: <span id="currentBuybackPrice">0.00...</span> <span id="buybackPriceSymbol">ETH</span></p>
                 
                 <div class="input-group">
                     <label>You Sell</label>
                     <div class="input-wrapper">
-                        <input type="number" id="swapAmountMirta"  placeholder="0.0" oninput="updateSwapReturn()">
+                        <input type="number" id="swapAmountMirta" placeholder="0.0" oninput="updateSwapReturn()">
                         <span class="token-symbol">MIRTA</span>
                     </div>
                 </div>
+                
                 <div class="swap-arrow">↓</div>
+                
                 <div class="input-group">
                     <label>You Receive (Estimate)</label>
                     <div class="input-wrapper readonly">
                         <input type="text" id="ethReceiveEstimate" placeholder="0.0" readonly>
-                        <span class="token-symbol">ETH</span>
+                        <span class="token-symbol" id="receiveTokenSymbol">ETH</span>
                     </div>
                 </div>
+                
                 <button class="mint-btn" id="swapBtn" onclick="swapMirta()">SWAP NOW</button>
                 <p class="swap-hint">* Required MIRTA Approval before swapping</p>
             </div>
@@ -290,6 +302,157 @@
 
     </div>
 
+    <div id="nft-mint-section" class="tab-content">
+        <div class="nft-grid">
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeiefgqgikud4zzjqjwygpzk7r4tnbddxczxuv7digwscv5lnck5n74" alt="NFT" class="nft-image">
+                    <span class="nft-id">#1</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana January</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(1)">MINT</button>
+                </div>
+            </div>
+    
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeias3gmfaj6532haybgotwmf3ixtvuyp2ktbhv5tobh43kwwysnili" alt="NFT" class="nft-image">
+                    <span class="nft-id">#2</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana February</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(2)">MINT</button>
+                </div>
+            </div>
+    
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeibohyqlulcvneu364fpsfyz25u5bryquol3azmdi2ghlb4ruq7zjm" alt="NFT" class="nft-image">
+                    <span class="nft-id">#3</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana March</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(3)">MINT</button>
+                </div>
+            </div>
+    
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeiap76t3o6xo73jnne6vjyyy2sxn2k57c4ftxoh2dmu56bomuu6y7y" alt="NFT" class="nft-image">
+                    <span class="nft-id">#4</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana April</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(4)">MINT</button>
+                </div>
+            </div>
+    
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeig2ancpwjnsmjcs6yuuouz6n4hqfp6uhch5nia6hdg72rezfrgmpy" alt="NFT" class="nft-image">
+                    <span class="nft-id">#5</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana May</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(5)">MINT</button>
+                </div>
+            </div>
+    
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeigsk4ccswblgk45ma7n7b4uhb7maxqfbsydm5gjiwjbdt77mchova" alt="NFT" class="nft-image">
+                    <span class="nft-id">#6</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana June</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(6)">MINT</button>
+                </div>
+            </div>
+    
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeicn25bixcyq6eluts77ui4dhawjp3vw3n7fryznhqrasmgnuskviq" alt="NFT" class="nft-image">
+                    <span class="nft-id">#7</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana July</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(7)">MINT</button>
+                </div>
+            </div>
+    
+            
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeievt7kdqqxnlextsjhagpcclfqbg46mg6zeikky3ribwqrs3pj5we" alt="NFT" class="nft-image">
+                    <span class="nft-id">#8</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana August</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(8)">MINT</button>
+                </div>
+            </div>
+
+           
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeibaasdyspehpm6ilymaars3vccycyzarhzxqmhvsuefra3qsvnbj4" alt="NFT" class="nft-image">
+                    <span class="nft-id">#9</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana September</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(9)">MINT</button>
+                </div>
+            </div>
+
+
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeie6emalqsqbxzvmmt6afseo2ktqcqzq6rvdqjejo2zjve4fqw3tia" alt="NFT" class="nft-image">
+                    <span class="nft-id">#10</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana October</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(10)">MINT</button>
+                </div>
+            </div>
+
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeifpgfz344q766fx2w55ajcs436bui5gl33mce6kzuegtj4h7mqkxu" alt="NFT" class="nft-image">
+                    <span class="nft-id">#11</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana November</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(11)">MINT</button>
+                </div>
+            </div>
+
+            <div class="nft-card">
+                <div class="nft-image-wrapper">
+                    <img src="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeiaprfe7pckfwui2xvwez5bbl77klw4nh75a5frveia7quolnxfrpm" alt="NFT" class="nft-image">
+                    <span class="nft-id">#12</span>
+                </div>
+                <div class="nft-details">
+                    <h4 class="nft-name">Mirtana December</h4>
+                    <div class="nft-price">10,000 MIRTA</div>
+                    <button class="nft-btn" onclick="mintNFT(12)">MINT</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
     </main>
 
 
@@ -304,17 +467,18 @@
 
     <footer class="footer">
         <div class="container footer-content">
-            <p class="copyright">© 2026 Mirtana Protocol. Built for Robinhood Chain Testnet.</p>
+            <p class="copyright">© 2026 Mirtana Protocol. Developed for the Arc Network and Robinhood Chain testnet.</p>
             <div class="social-links">
                 <a href="https://x.com/MirtanaProtocol" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
                 <a href="https://t.me/mirtanaprotocol" target="_blank"><i class="fab fa-telegram"></i></a>
                 <a href="https://discord.gg/SdwEBqRrQj" target="_blank"><i class="fab fa-discord"></i></a>
                 <a href="https://github.com/Mirtana/Protocol.git" target="_blank"><i class="fab fa-github"></i></a>
-                <a href="https://explorer.testnet.chain.robinhood.com/" target="_blank"><i class="fa-solid fa-parachute-box"></i></a>
+                <a href="https://explorer.testnet.chain.robinhood.com/" target="_blank"><i class="fa-solid fa-feather"></i></a>
                 <a href="https://testnet.arcscan.app/" target="_blank"><i class="fa-brands fa-airbnb"></i></a>
             </div>
         </div>
     </footer>
+
 
     <div id="txModal" class="modal-overlay hidden">
         <div class="modal-contentmint">
@@ -366,6 +530,8 @@
     <script src="TokenFactory.js"></script>
     
     <script src="Transfer_MIRTA.js"></script>
+
+    <script src="NFT_Mirtana.js"></script>
 
 
 

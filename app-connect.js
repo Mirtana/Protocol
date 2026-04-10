@@ -277,7 +277,7 @@ async function addTokenToWallet() {
                     address: config.MIRTA,
                     symbol: 'MIRTA',
                     decimals: 18,
-                    image: 'https://mirtana.com/logo.png',
+                    image: '#',
                 },
             },
         });
@@ -507,3 +507,27 @@ function triggerModal(title, message, type = 'info') {
         }
     }, 100); 
 }
+
+
+
+// Универсальное закрытие модалок при клике на темный фон (Overlay)
+window.addEventListener('click', function(event) {
+    const statusModal = document.getElementById('statusModal');
+    const txModal = document.getElementById('txModal');
+    const loader = document.getElementById('statusLoader');
+
+    // 1. Обработка для statusModal
+    if (event.target === statusModal) {
+        // Проверяем, не идет ли сейчас загрузка, чтобы не закрыть окно случайно
+        const isIdle = !loader || loader.style.display === 'none';
+        if (isIdle) {
+            closeStatusModal();
+        }
+    }
+
+    // 2. Обработка для txModal
+    if (event.target === txModal) {
+        // Здесь обычно closeModal() просто скрывает окно
+        closeModal();
+    }
+});

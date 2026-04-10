@@ -2,16 +2,13 @@
 
 .modal-overlay {
     position: fixed;
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85);
     display: flex; 
-    align-items: center; 
-    justify-content: center;
+    align-items: center; /* Центр по вертикали */
+    justify-content: center; /* Центр по горизонтали */
     z-index: 1000; 
-    transition: 0.3s;
 }
 .modal-overlay.hidden { 
     display: none; 
@@ -22,12 +19,13 @@
     background: #0d1117;
     border: 1px solid rgba(0, 255, 255, 0.3); 
     border-radius: 20px;
-    max-width: 320px;
+    max-width: 340px; /* Немного увеличим для запаса */
     padding: 30px 25px; 
-    margin: 20% auto;
+    /* margin: 20% auto; <-- УДАЛИ ЭТУ СТРОКУ */
     text-align: center; 
     width: 90%;
     color: white;
+    height: auto !important; /* Добавь это */
 }
 .close-x {
     position: absolute; 
@@ -102,25 +100,29 @@
 /* Модульное Окно Для Стейкинга */
 
 #statusModal.modal {
-    display: none;
+    display: none; /* Будет flex при показе */
     position: fixed;
     z-index: 9999;
     left: 0; top: 0;
     width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
+    /* Добавь эти две строки ниже: */
+    align-items: center;
+    justify-content: center;
 }
 .status-content {
     position: relative;
     background: #0f1216;
     border: 1px solid rgba(0, 255, 255, 0.3);
     border-radius: 20px;
-    max-width: 320px;
+    max-width: 340px; 
     padding: 30px 25px;
-    margin: 20% auto;
+    /* margin: 20% auto; <-- УДАЛИ ЭТУ СТРОКУ */
     text-align: center;
     width: 90%;
     color: white;
+    height: auto !important; /* Добавь это */
 }
 #statusCloseBtn {
     display: block;
@@ -188,6 +190,13 @@
     line-height: 1.5;
 }
 
+#statusMessage, #modalDesc {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-height: 300px; /* На всякий случай */
+    overflow-y: auto;  /* Если текст будет совсем гигантским, появится скролл внутри */
+    margin-bottom: 10px;
+}
 
 /* АДАПТИВ МОДУЛЬНОГО ОКНА "МИНТА" ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
 @media (max-width: 480px) {
@@ -220,9 +229,6 @@
         padding: 12px;
     }
 }
-
-
-
 
 
 
@@ -270,3 +276,5 @@
     50% { transform: scale(1.1); opacity: 0.8; }
     100% { transform: scale(1); opacity: 1; }
 }
+
+

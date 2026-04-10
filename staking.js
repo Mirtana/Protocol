@@ -215,7 +215,7 @@ async function stakeTokens() {
     const explorerLink = document.getElementById('explorerLink');
     const stakedAmountDisplay = document.getElementById('stakedAmountInfo');
 
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
     loader.style.display = 'block';
     txInfo.style.display = 'none';
     closeBtn.style.display = 'none';

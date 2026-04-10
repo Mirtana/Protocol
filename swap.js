@@ -68,6 +68,8 @@ function updateSwapReturn() {
 
 /** * 4. Функция Свапа MIRTA -> ETH 
  */
+/** * Функция Свапа MIRTA -> ETH/USDC 
+ */
 async function swapMirta() {
     const amountInput = document.getElementById('swapAmountMirta').value;
     if (!amountInput || amountInput <= 0) return alert("Enter amount!");
@@ -79,6 +81,10 @@ async function swapMirta() {
     try {
         const net = await provider.getNetwork();
         const chainId = Number(net.chainId);
+        
+        // Определяем символ для уведомлений
+        const symbol = (chainId === 5042002) ? "USDC" : "ETH";
+        
         const amountWei = ethers.parseUnits(amountInput, 18);
         const userAddress = await signer.getAddress();
         const mirtaAddress = CONTRACT_CONFIG[chainId].MIRTA;
@@ -92,19 +98,21 @@ async function swapMirta() {
         const currentAllowance = await mirtaToken.allowance(userAddress, swapContract.target);
 
         if (currentAllowance < amountWei) {
-            openModal('loading', 'Step 1/2: Approving MIRTA...');
+            openModal('loading', `Step 1/2: Approving MIRTA...`);
             const txApprove = await mirtaToken.approve(swapContract.target, amountWei);
             await txApprove.wait();
         }
 
-        // 2. Выполняем сам Свап
-        openModal('loading', 'Step 2/2: Swapping to ETH...');
+        // 2. Выполняем сам Свап (текст теперь динамический)
+        openModal('loading', `Step 2/2: Swapping to ${symbol}...`);
+        
+        // ВАЖНО: Если в контракте функция называется swapMirtaToEth, 
+        // она всё равно будет работать, так как в Arc нативный актив — USDC
         const txSwap = await swapContract.swapMirtaToEth(amountWei);
         await txSwap.wait();
 
-        openModal('success', `Successfully swapped ${amountInput} MIRTA for ETH!`, txSwap.hash);
+        openModal('success', `Successfully swapped ${amountInput} MIRTA for ${symbol}!`, txSwap.hash);
         
-        // Обновляем балансы в хедере и цену
         if (typeof updateBalances === "function") await updateBalances(); 
         await fetchSwapPrice();
         document.getElementById('swapAmountMirta').value = "";
@@ -116,3 +124,43 @@ async function swapMirta() {
         openModal('error', errorMessage);
     }
 }
+
+async function updateNetworkIdentity() {
+    if (!window.ethereum) return;
+    
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const network = await provider.getNetwork();
+    const chainId = Number(network.chainId);
+
+    const isArc = (chainId === 5042002);
+    const symbol = isArc ? "USDC" : "ETH";
+
+    // 1. Меняем текстовые символы (Свап и т.д.)
+    const elements = {
+        'swapTitleSymbol': symbol,
+        'buybackPriceSymbol': symbol,
+        'receiveTokenSymbol': symbol
+    };
+
+    for (let [id, val] of Object.entries(elements)) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    }
+
+    // 2. МЕНЯЕМ ИКОНКУ В ХЕДЕРЕ
+    const nativeIcon = document.getElementById('native-icon');
+    if (nativeIcon) {
+        if (isArc) {
+            // Классы Font Awesome для доллара
+            nativeIcon.className = 'fas fa-dollar-sign';
+        } else {
+            // Классы Font Awesome для Эфира
+            nativeIcon.className = 'fab fa-ethereum';
+        }
+    }
+}
+
+// Вызывать при загрузке и при смене сети
+updateNetworkIdentity();
+window.ethereum.on('chainChanged', updateNetworkIdentity);
+
