@@ -1,0 +1,324 @@
+/* ============================================================
+   1. ПОВЕДЕНИЕ ВКЛАДОК И КОНТЕЙНЕРЫ
+   ============================================================ */
+   .tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+}
+
+#dashboard-section {
+    padding: 4px 2px;
+    min-height: 100vh;
+    height: auto !important;
+    overflow-y: visible !important;
+}
+
+/* ============================================================
+   2. ШАПКА И СТАТИСТИКА
+   ============================================================ */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-header h2.neon-text {
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.8), 0 0 20px rgba(0, 242, 255, 0.4);
+    font-size: 3.2em;
+    margin-bottom: 15px;
+    font-family: 'Alegreya', serif;
+}
+
+.user-stats {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    background: rgba(0, 232, 255, 0.05);
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 232, 255, 0.2);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.stat-value.neon-blue { color: #ffcc00; text-shadow: 0 0 15px #ffcc00; }
+.stat-value.neon-cyan { color: #00f2ff; text-shadow: 0 0 5px #00f2ff; }
+
+/* ============================================================
+   3. ГРИД И КАРТОЧКИ NFT
+   ============================================================ */
+.dashboard-grid.hall-of-fame {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 30px;
+    padding: 30px 0;
+    width: 100%;
+    max-width: 1200px;
+    border: solid 1px rgba(0, 242, 255, 0.192);
+    border-radius: 20px;
+    padding: 15px;
+}
+
+/* НОВЫЙ ВАРИАНТ: фильтр только для картинки */
+.nft-collection-card.locked .nft-card-img {
+    filter: grayscale(100%) brightness(0.4); /* Картинка станет серой и темной */
+}
+
+.nft-collection-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(14, 170, 179, 0.26);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: 0.4s ease-out;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Гарантируем высоту */
+}
+
+.nft-collection-card.unlocked {
+    border-color: rgba(0, 242, 255, 0.6);
+    box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+}
+
+.nft-collection-card.unlocked:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 30px rgba(0, 242, 255, 0.5);
+}
+
+/* .nft-collection-card.locked {
+    filter: grayscale(100%) brightness(0.4);
+    opacity: 0.6;
+} */
+
+.nft-card-img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.nft-card-info {
+    position: absolute;
+    top: 0; bottom: 0; left: 0; right: 0;
+    padding: 15px;
+    z-index: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+}
+
+.nft-card-info * {
+    pointer-events: auto;
+}
+
+.nft-month {
+    display: none;
+}
+
+
+.unlocked .nft-status { 
+    color: #15e264; 
+    text-transform: uppercase; 
+    font-size: 0.85em; 
+    letter-spacing: 2px; 
+    font-weight: 800;
+    margin-top: 5px;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.6);
+}
+
+.locked .nft-status {
+    color: #e41f11;
+    text-shadow: 0 0 10px #e41f11;
+}
+
+
+.btn-transfer-card {
+    background: rgba(0,0,0,0.8);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid #00f2ff;
+    color: #00f2ff;
+    transition: 0.2s;
+    margin-bottom: 0px;
+    width: fit-content;
+    align-self: center;
+}
+
+.btn-transfer-card:hover {
+    background: #00f2ff;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.5);
+}
+
+/* Кнопка MINT NOW (для заблокированных) */
+.btn-mint-card {
+    background: rgba(0,0,0,0.8);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 0.75em;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    transition: 0.2s;
+    margin-bottom: 5px;
+    width: fit-content;
+    align-self: center;
+}
+
+/* ============================================================
+   4. ИНФО-ПАНЕЛЬ (MINT LIMIT)
+   ============================================================ */
+.info-panel {
+    width: 100%;
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+.panel-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 850px;
+    padding: 15px 25px;
+    border: 1px dashed rgba(0, 242, 255, 0.4);
+    border-radius: 12px;
+    background: rgba(0, 242, 255, 0.05);
+    color: #00f2ff;
+    line-height: 1.4;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+    animation: pulse-warning 3s infinite ease-in-out;
+}
+
+.panel-icon {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 0 5px #ffcc00);
+}
+
+.panel-text {
+    margin: 0;
+    color: #ffffff;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.panel-text b {
+    color: #00f2ff;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.8);
+}
+
+
+  /* ============================================================
+   5. TRANSFER MODAL (FIXES)
+   ============================================================ */
+#destAddress {
+    width: 100%;
+    max-width: 380px;
+    padding: 12px;
+    margin: 20px 0;
+    border-radius: 8px;
+    border: 1px solid #00f2ff;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.mint-btn {
+    background: linear-gradient(90deg, #00f2ff, #0066ff);
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: 0.3s;
+    display: block;
+    width: 60%;
+    max-width: 200px;
+    margin: 10px auto;
+}
+/* ------------------------------------------------ */
+
+.intro-text {
+    text-align: center;
+    font-family: 'Cinzel', 'Georgia', serif;
+}
+
+/* Основной текст — в стиле твоего заголовка "My Mirtana Collection" */
+.legend-text {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #0eebf3;
+    text-shadow: 0 0 10px rgba(0, 242, 255, 0.8), 0 0 20px rgba(0, 242, 255, 0.4);
+    margin-bottom: 10px;
+}
+
+/* Legend — делаем более премиальным и гармоничным */
+.legend {
+    font-size: 24px;
+    font-weight: 800;
+    color: #ffcc00; 
+    text-shadow: 
+        0 0 12px #e9d205,
+        0 0 28px #c5c20b,
+        0 0 50px #b3a20b,
+        0 0 75px #f0d90d;
+}
+
+.epic-legend {
+    display: block;
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #c0f0ff;
+    text-shadow: 0 0 4px #c0f0ff, 0 0 14px #80e0ff, 0 0 25px #40b8ff;
+}
+  
+
+/* ============================================================
+   6. MOBILE ADAPTIVITY
+   ============================================================ */
+@media (max-width: 768px) {
+    .dashboard-header h2.neon-text { font-size: 1.8em; }
+    .dashboard-grid.hall-of-fame { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+    .panel-content { flex-direction: column; text-align: center; padding: 20px; }
+    
+    .unlocked  {
+        margin-bottom: 5px;
+    }
+    .btn-transfer-card{
+        padding: 5px 8px;
+        margin-bottom: 10px;
+       
+    }
+    .btn-mint-card{
+        padding: 5px 8px;
+    }
+    .nft-card-info{
+       padding: 5px;
+    }
+
+    
+}

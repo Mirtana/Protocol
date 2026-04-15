@@ -8,7 +8,8 @@
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
-    text-align: center; /* Центрируем заголовки внутри карточки */
+    text-align: center;
+    box-sizing: border-box;
 }
 
 /* Общие стили для инпутов */
@@ -117,4 +118,18 @@ input::-webkit-inner-spin-button {
 
 .main-btn:active {
     transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .transfer-card {
+        padding: 18px;
+        border-radius: 16px;
+        max-width: 100%;           /* На планшетах делаем почти на всю ширину */
+        margin: 10px auto;
+    }
+
+    .main-btn {
+        width: 100%;               /* Кнопка на всю ширину */
+        max-width: 280px;
+    }
 }

@@ -12,13 +12,13 @@
     font-family: 'Segoe UI', Roboto, sans-serif;
     font-size: 14px;
     line-height: 1.4;
-    backdrop-filter: blur(10px); /* Эффект стекла, как в твоем Mint/Swap */
+    backdrop-filter: blur(10px);
     box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
     animation: pulse-warning 3s infinite ease-in-out;
 }
 
 .testnet-warning i {
-    font-size: 18px;
+    font-size: 1.8rem;
     color: #ffcc00; /* Янтарный цвет для иконки внимания */
     filter: drop-shadow(0 0 5px #ffcc00);
 }
