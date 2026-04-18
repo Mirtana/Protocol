@@ -8,7 +8,6 @@ const GM_ADDRESSES = {
 
 let gmCountdown;
 
-// 1. ЕДИНАЯ ФУНКЦИЯ ПРОВЕРКИ СТАТУСА
 async function checkGMStatus() {
     const btn = document.getElementById('gmBtn');
     const timerText = document.getElementById('gmTimerText');
@@ -56,7 +55,6 @@ async function checkGMStatus() {
     }
 }
 
-// 2. ТАЙМЕР
 function startGMTimer(seconds) {
     const btn = document.getElementById('gmBtn');
     const timerText = document.getElementById('gmTimerText');
@@ -80,131 +78,6 @@ function startGMTimer(seconds) {
     }, 1000);
 }
 
-// 3. ОСНОВНАЯ ЛОГИКА ТРАНЗАКЦИИ
-async function handleGM() {
-    const btn = document.getElementById('gmBtn');
-    try {
-        const network = await provider.getNetwork();
-        const chainId = Number(network.chainId);
-        const gmAddr = GM_ADDRESSES[chainId];
-        
-        if (!gmAddr) return alert("Please switch to a supported network!");
-
-        const contract = new ethers.Contract(gmAddr, GM_ABI, signer);
-
-        // Показываем окно загрузки СРАЗУ
-        showGMProcessingModal();
-        if (btn) btn.disabled = true;
-
-        const tx = await contract.sayGM();
-        console.log("Transaction sent:", tx.hash);
-
-        let explorerUrl = "";
-        if (chainId === 46630) explorerUrl = `https://explorer.testnet.chain.robinhood.com/tx/${tx.hash}`;
-        else if (chainId === 5042002) explorerUrl = `https://testnet.arcscan.app/tx/${tx.hash}`;
-        else if (chainId === 97) explorerUrl = `https://testnet.bscscan.com/tx/${tx.hash}`;
-
-        // Ждем подтверждения
-        await tx.wait();
-        
-        // Показываем успех
-        showGMSuccessModal(tx.hash, explorerUrl);
-        await checkGMStatus();
-
-    } catch (error) {
-        console.error("GM error:", error);
-        // Закрываем модалку при ошибке, чтобы она не висела вечно
-        const modal = document.getElementById('txModal');
-        if (modal) modal.style.display = 'none';
-
-        if (error.code === 4001) {
-            // Пользователь сам нажал "Отмена" в Метамаске — алерт тут уместен
-            alert("Transaction rejected");
-        } 
-        await checkGMStatus();
-    }
-}
-
-// 4. МОДАЛЬНЫЕ ОКНА (С исправленным принудительным показом)
-function showGMProcessingModal(isFactory = false) {
-    const modal = document.getElementById('txModal');
-    if (!modal) return;
-
-    // --- БЛОК СБРОСА (Fix для повторного вызова) ---
-    // Скрываем и удаляем инлайновые стили перед новым показом
-    modal.classList.add('hidden');
-    modal.style.removeProperty('display');
-    
-    // Используем небольшую задержку, чтобы DOM успел обновить состояние
-    setTimeout(() => {
-        // Меняем текст в зависимости от того, что делаем
-        const titleElem = document.getElementById('modalTitle');
-        const iconElem = document.getElementById('modalIcon');
-        const descElem = document.getElementById('modalDesc');
-        const linkElem = document.getElementById('modalLinkHolder');
-
-        if (titleElem) titleElem.innerText = isFactory ? "Deploying Token..." : "Sending Transaction...";
-        
-        // Вставляем новый SVG-спиннер с классом neon-spinner
-        if (iconElem) {
-            iconElem.innerHTML = `
-                <div class="neon-spinner">
-                    <svg viewBox="0 0 50 50">
-                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
-                    </svg>
-                </div>`;
-        }
-
-        const desc = isFactory 
-            ? "Creating your smart contract... Please confirm in wallet." 
-            : "Processing your transaction... Please confirm in wallet.";
-            
-        if (descElem) descElem.innerHTML = `<p style="color: rgba(255,255,255,0.7);">${desc}</p>`;
-        if (linkElem) linkElem.innerHTML = "";
-
-        // Принудительно отображаем модалку
-        modal.style.setProperty('display', 'flex', 'important');
-        modal.classList.remove('hidden');
-    }, 10); 
-}
-
-function showGMSuccessModal(hash, url, isFactory = false) {
-    const modal = document.getElementById('txModal');
-    if (!modal) return;
-
-    document.getElementById('modalTitle').innerText = isFactory ? "Token Deployed!" : "GM Recorded!";
-    
-    // Галочка с неоновым свечением
-    document.getElementById('modalIcon').innerHTML = '<div class="success-icon-neon">✔</div>';
-    
-    const desc = isFactory 
-        ? "Your custom smart contract is now live on blockchain!" 
-        : "Your daily activity has been recorded!";
-
-    document.getElementById('modalDesc').innerHTML = `<p style="color: rgba(255,255,255,0.7);">${desc}</p>`;
-
-    if (hash) {
-        document.getElementById('modalLinkHolder').innerHTML = `
-            <div style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                <a href="${url}" target="_blank" style="color: #00f2ff; text-decoration: none; font-size: 13px;">
-                    View Transaction ↗
-                </a>
-            </div>`;
-    }
-
-    modal.classList.remove('hidden'); 
-    modal.style.setProperty('display', 'flex', 'important');
-}
-
-function closeModal() {
-    const modal = document.getElementById('txModal');
-    if (modal) {
-        modal.classList.add('hidden');
-        // Обязательно удаляем инлайновый стиль, который добавили через JS
-        modal.style.removeProperty('display'); 
-    }
-}
-
 async function initGMContract() {
     const { chainId } = await provider.getNetwork();
     
@@ -221,11 +94,68 @@ async function initGMContract() {
     return gmContract;
 }
 
+async function handleGM() {
+    const btn = document.getElementById('gmBtn');
+    try {
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId);
+        const gmAddr = GM_ADDRESSES[chainId];
+        
+        if (!gmAddr) return alert("Please switch to a supported network!");
+
+        const contract = new ethers.Contract(gmAddr, GM_ABI, signer);
+
+        // ИСПОЛЬЗУЕМ НОВУЮ СТРУКТУРУ
+        // openModal(type, message, txHash, extra)
+        if (window.openModal) {
+            window.openModal('loading', 'Recording your daily GM activity... Please confirm in wallet.');
+        }
+
+        if (btn) btn.disabled = true;
+
+        const tx = await contract.sayGM();
+        
+        // Обновляем модалку - показываем, что транзакция в сети
+        if (window.openModal) {
+            const explorerUrl = getExplorerUrl(chainId, tx.hash);
+            window.openModal('loading', 'GM Transaction sent! Waiting for blockchain confirmation...', tx.hash);
+        }
+
+        await tx.wait();
+        
+        // УСПЕХ
+        if (window.openModal) {
+            const explorerUrl = getExplorerUrl(chainId, tx.hash);
+            window.openModal('success', 'Your daily GM has been recorded forever!', tx.hash);
+        }
+
+        await checkGMStatus();
+
+    } catch (error) {
+        console.error("GM error:", error);
+        if (window.closeStatusModal) window.closeStatusModal();
+        
+        if (error.code === 4001) {
+            alert("Transaction rejected");
+        } else {
+            // Можно вызвать openModal с типом 'error'
+            if (window.openModal) window.openModal('error', error.reason || "Transaction failed");
+        }
+        await checkGMStatus();
+    }
+}
+
+function getExplorerUrl(chainId, hash) {
+    const explorers = {
+        46630: "https://explorer.testnet.chain.robinhood.com/tx/",
+        5042002: "https://testnet.arcscan.app/tx/"
+    };
+    return (explorers[chainId] || "") + hash;
+}
+
 // Глобальный доступ
 window.handleGM = handleGM;
 window.checkGMStatus = checkGMStatus;
-window.showGMSuccessModal = showGMSuccessModal;
-
 if (window.ethereum) {
     window.ethereum.on('chainChanged', () => window.location.reload());
 }

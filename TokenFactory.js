@@ -26,71 +26,86 @@ async function deployToken() {
     const supply = document.getElementById('tokenSupply').value;
 
     if (!name || !symbol || !supply) {
-        triggerModal("Empty Fields", "Please fill in all the parameters to generate your token.", "error");
+        if (window.openModal) {
+            window.openModal('error', 'Please fill in all parameters to generate your token.');
+        } else {
+            alert("Empty Fields: Please fill in all parameters.");
+        }
         return;
     }
 
     try {
-        // Определяем текущую сеть
         const network = await provider.getNetwork();
         const chainId = Number(network.chainId);
         const config = FACTORY_CONFIG[chainId];
 
-        // Проверяем, развернута ли фабрика в этой сети
         if (!config) {
-            triggerModal("Unsupported Network", "Please switch to Arc or Robinhood network.", "error");
+            if (window.openModal) {
+                window.openModal('error', 'Unsupported Network. Please switch to Arc or Robinhood.');
+            }
             return;
         }
 
-        // Создаем контракт фабрики с динамическим адресом
+        // 1. Инициализация модалки
+        if (window.openModal) {
+            window.openModal('loading', `Preparing to deploy ${name} (${symbol})...`);
+        }
+
         const factory = new ethers.Contract(config.address, FACTORY_ABI, signer);
         
-        showGMProcessingModal(true); 
-        
-        document.getElementById('modalTitle').innerText = "Deploying Token...";
-        document.getElementById('modalDesc').innerText = `Creating ${name} (${symbol}) on ${chainId === 5042002 ? 'Arc' : 'Robinhood'}...`;
-
-        // Отправка транзакции
+        // 2. Отправка транзакции в кошелек
         const tx = await factory.createToken(name, symbol, supply, selectedType);
+        
+        // 3. Статус: Ждем блокчейн
+        if (window.openModal) {
+            window.openModal('loading', 'Deploying your smart contract to the blockchain...', tx.hash);
+        }
+
         await tx.wait();
-        
-        // Показываем успех с правильной ссылкой на эксплорер
-        showGMSuccessModal(tx.hash, `${config.explorer}${tx.hash}`);
 
-        console.log("Refreshing tokens list...");
-        
-        // Обновляем UI
-        document.getElementById('modalTitle').innerText = "Token Deployed!";
-        document.getElementById('modalDesc').innerText = "Your custom smart contract is now live.";
+        // 4. УСПЕХ
+        if (window.openModal) {
+            const successMsg = `
+                <div style="color: #00f2ff; font-weight: bold; margin-bottom: 10px;">Token Deployed Successfully!</div>
+                <p>Your custom smart contract <strong>${name}</strong> is now live on the network.</p>
+            `;
+            window.openModal('success', successMsg, tx.hash);
+        }
 
-        setTimeout(() => { loadUserTokens(); }, 1000);
+        // Очистка полей
+        document.getElementById('tokenName').value = "";
+        document.getElementById('tokenSymbol').value = "";
+        document.getElementById('tokenSupply').value = "";
+
+        // Обновляем список токенов пользователя
+        setTimeout(() => { loadUserTokens(); }, 1500);
 
     } catch (e) {
         console.error("Deployment Error:", e);
-        closeModal(); 
-
-        if (e.code !== 4001) {
-            console.log("Transaction failed for reason other than user rejection.");
-            triggerModal("Transaction Failed", "Something went wrong during deployment.", "error");
+        
+        if (e.code === 4001) {
+            if (window.closeStatusModal) window.closeStatusModal();
         } else {
-            console.log("User cancelled the deployment.");
+            const errorMsg = e.reason || e.message || "Something went wrong during deployment.";
+            if (window.openModal) {
+                window.openModal('error', errorMsg);
+            }
         }
     }
 }
 
 async function loadUserTokens() {
-    if (!userAccount) return;
+    if (!userAccount || !provider) return;
     const list = document.getElementById('userTokensList');
+    if (!list) return;
     
     try {
-        // Определяем текущую сеть для выбора правильной фабрики
         const network = await provider.getNetwork();
         const chainId = Number(network.chainId);
         const config = FACTORY_CONFIG[chainId];
 
-        // Если сеть не поддерживается, очищаем список и выходим
         if (!config) {
-            list.innerHTML = `<p style="text-align:center; opacity:0.6;">Unsupported network for factory.</p>`;
+            list.innerHTML = `<p style="text-align:center; opacity:0.6;">Unsupported network.</p>`;
             return;
         }
 
@@ -98,7 +113,7 @@ async function loadUserTokens() {
         const tokenAddresses = await factory.getUserTokens(userAccount);
         
         if (tokenAddresses.length === 0) {
-            list.innerHTML = `<p style="text-align:center; opacity:0.6;">You haven't created any tokens on this network yet.</p>`;
+            list.innerHTML = `<p style="text-align:center; opacity:0.6;">You haven't created any tokens here yet.</p>`;
             return;
         }
 
@@ -118,23 +133,16 @@ async function loadUserTokens() {
                     tokenContract.totalSupply(),
                     tokenContract.decimals()
                 ]);
-
-                // Поддержка разных версий ethers для форматирования чисел
-                const formattedTotal = ethers.formatUnits 
-                    ? ethers.formatUnits(total, decimals) 
-                    : ethers.utils.formatUnits(total, decimals);
-
+                const formattedTotal = ethers.formatUnits(total, decimals);
                 return { addr, name, symbol, total: formattedTotal };
             } catch (err) {
-                console.error("Error fetching token data:", addr, err);
                 return { addr, name: "Unknown", symbol: "???", total: "0" };
             }
         });
 
         const allTokens = await Promise.all(tokenDataPromises);
 
-        // Рендерим список
-        list.innerHTML = allTokens.map(token => `
+        list.innerHTML = allTokens.reverse().map(token => `
             <div class="token-item">
                 <div class="token-info">
                     <div class="token-header">
@@ -145,42 +153,28 @@ async function loadUserTokens() {
                     </div>
                     <div class="token-stats">
                         <p>Supply: <strong>${parseFloat(token.total).toLocaleString()}</strong></p>
-                        <span>${token.addr.substring(0, 10)}...${token.addr.substring(token.addr.length - 5)}</span>
+                        <span>${token.addr.substring(0, 10)}...${token.addr.substring(token.addr.length - 4)}</span>
                     </div>
                 </div>
             </div>
         `).join('');
 
     } catch (e) {
-        console.log("Error loading dashboard:", e);
-        list.innerHTML = `<p style="text-align:center; color: #ff4d4d;">Failed to load tokens.</p>`;
+        console.error("Load dashboard error:", e);
+        list.innerHTML = `<p style="text-align:center; color: #ff4d4d;">Error loading token list.</p>`;
     }
 }
 
-function closeModal() {
-    const modal = document.getElementById('txModal');
-    if (!modal) return;
-
-    // 1. Прячем визуально (твой старый метод)
-    modal.classList.add('hidden');
-    
-    // 2. УБИРАЕМ БЛОКИРОВКУ (самое важное)
-    // Это гарантирует, что невидимое окно перестанет перекрывать кнопки
-    modal.style.display = 'none'; 
-    modal.style.setProperty('display', 'none', 'important'); 
-    
-    // 3. Сбрасываем контент
-    document.getElementById('modalLinkHolder').innerHTML = "";
-}
-// Универсальная функция копирования
 function copyToClipboard(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
         const icon = btn.querySelector('i');
-        icon.classList.replace('fa-copy', 'fa-check');
-        icon.style.color = '#00f2ff';
-        setTimeout(() => {
-            icon.classList.replace('fa-check', 'fa-copy');
-            icon.style.color = '';
-        }, 2000);
+        if (icon) {
+            icon.classList.replace('fa-copy', 'fa-check');
+            icon.style.color = '#00f2ff';
+            setTimeout(() => {
+                icon.classList.replace('fa-check', 'fa-copy');
+                icon.style.color = '';
+            }, 2000);
+        }
     });
 }

@@ -41,11 +41,10 @@ let provider, signer, MIRTAContract;
 let userAccount = null;
 let currentPriceWei = 0n;
 
-// ==========================================
+// =========================================
 // 2. ИНИЦИАЛИЗАЦИЯ И ПОДКЛЮЧЕНИЕ
-// ==========================================
+// =========================================
 
-/** Основная функция подключения кошелька и настройки интерфейса */
 async function connect() {
     if (!window.ethereum) return alert("Install Wallet");
     try {
@@ -75,7 +74,44 @@ async function connect() {
     } catch (e) { console.error(e); }
 }
 
-/** Создает экземпляр контракта для работы с текущей сетью */
+async function init() {
+    await syncNetworkDisplay();
+    await updateMintProgress();
+
+    if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+            await connect();
+        }
+    }
+}
+
+async function initStaking() {
+    if (window.ethereum) {
+        try {
+            provider = new ethers.BrowserProvider(window.ethereum);
+            globalSigner = await provider.getSigner();
+            
+            const network = await provider.getNetwork();
+            const chainId = Number(network.chainId);
+            
+            if (ADDRESSES[chainId]) {
+                STAKING_ADDRESS = ADDRESSES[chainId].staking;
+                MIRTA_TOKEN_ADDRESS = ADDRESSES[chainId].token;
+                console.log(`✅ Connected to ${chainId}! Staking: ${STAKING_ADDRESS}`);
+            } else {
+                console.error("❌ Unsupported network:", chainId);
+                return; 
+            }
+
+            stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, globalSigner);
+            await loadUserStakes();
+        } catch (e) { 
+            console.error("Init Error:", e); 
+        }
+    }
+}
+
 function setupContracts(chainId, signerOrProvider) {
     const config = CONTRACT_CONFIG[Number(chainId)];
     if (!config) {
@@ -93,26 +129,13 @@ function setupContracts(chainId, signerOrProvider) {
     }
 }
 
-/** Функция инициализации при загрузке страницы */
-async function init() {
-    await syncNetworkDisplay();
-    await updateMintProgress();
-
-    if (window.ethereum) {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        if (accounts.length > 0) {
-            await connect();
-        }
-    }
-}
 
 
 
-// ==========================================
+// =========================================
 // 3. ПОЛУЧЕНИЕ ДАННЫХ И ОБНОВЛЕНИЕ UI
-// ==========================================
+// =========================================
 
-/** Загружает актуальную цену минта из контракта */
 async function fetchMIRTAData() {
     if (!MIRTAContract) return;
     try {
@@ -133,7 +156,6 @@ async function fetchMIRTAData() {
     }
 }
 
-/** Обновляет баланс ETH и токенов MIRTA для пользователя */
 async function updateBalances() {
     if (!userAccount || !provider) return;
     
@@ -146,7 +168,6 @@ async function updateBalances() {
     }
 }
 
-/** Рассчитывает прогресс минта и обновляет Progress Bar */
 async function updateMintProgress() {
     if (!MIRTAContract) return;
     try {
@@ -176,7 +197,6 @@ async function updateMintProgress() {
     }
 }
 
-/** Синхронизирует отображение текущей сети в кнопке меню */
 async function syncNetworkDisplay() {
     if (!window.ethereum) return;
     try {
@@ -199,14 +219,51 @@ async function syncNetworkDisplay() {
     }
 }
 
+async function switchNetwork(targetChainId) {
+    const config = CONTRACT_CONFIG[Number(targetChainId)];
+    if (!config) {
+        console.error("Network configuration not found for ID:", targetChainId);
+        return;
+    }
 
+    const hexChainId = config.chainIdHex || '0x' + Number(targetChainId).toString(16);
+
+    try {
+        
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: hexChainId }],
+        });
+    } catch (switchError) {
+        
+        if (switchError.code === 4902 || switchError.code === -32603) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: hexChainId,
+                        chainName: config.networkName,
+                        rpcUrls: [config.rpcUrl],
+                        nativeCurrency: { 
+                            name: config.nativeTicker, 
+                            symbol: config.nativeTicker, 
+                            decimals: 18 
+                        },
+                        blockExplorerUrls: [config.explorerUrl]
+                    }]
+                });
+            } catch (addError) {
+                console.error("User rejected adding the network");
+            }
+        }
+    }
+}
 
 
 // ==========================================
 // 4. ЛОГИКА МИНТА И КАЛЬКУЛЯТОРА
 // ==========================================
 
-/** Главная функция покупки (минта) токенов за нативную валюту */
 async function mintToken() {
     if (!MIRTAContract) return;
     try {
@@ -265,7 +322,6 @@ async function setMaxMint() {
     }
 }
 
-/** Добавляет токен MIRTA в список активов кошелька пользователя */
 async function addTokenToWallet() {
     const chainId = Number(await window.ethereum.request({ method: 'eth_chainId' }));
     const config = CONTRACT_CONFIG[chainId];
@@ -286,172 +342,6 @@ async function addTokenToWallet() {
         });
     } catch (error) { console.error("Ошибка при добавлении токена:", error); }
 }
-
-
-
-
-// ==========================================
-// 5. МОДАЛЬНЫЕ ОКНА И UI ВЗАИМОДЕЙСТВИЕ
-// ==========================================
-
-/** Управляет отображением статусов транзакций (загрузка, успех, ошибка) */
-function openModal(type, message, txHash = null) {
-    const modal = document.getElementById('txModal');
-    const icon = document.getElementById('modalIcon');
-    const desc = document.getElementById('modalDesc');
-    const linkHolder = document.getElementById('modalLinkHolder');
-    const title = document.getElementById('modalTitle');
-    const closeBtn = document.getElementById('modalCloseBtn');
-
-    if (!modal) return;
-
-    // 1. ПРИНУДИТЕЛЬНЫЙ СБРОС (Ключ к решению проблемы)
-    modal.classList.add('hidden'); // Сначала скрываем
-    modal.style.display = 'none';   // Убираем из потока
-    void modal.offsetWidth;         // ФОРСИРУЕМ ПЕРЕРИСОВКУ (Reflow) браузера
-
-    // 2. Очистка и настройка данных
-    linkHolder.innerHTML = ''; 
-    const chainId = window.ethereum ? Number(window.ethereum.chainId) : null;
-    const config = chainId ? CONTRACT_CONFIG[chainId] : null;
-    const explorerUrl = config ? config.explorerUrl : "";
-
-    if (type === 'loading') {
-        title.innerText = "Processing...";
-        icon.innerHTML = '<i class="fas fa-spinner loading-icon fa-spin"></i>'; // Добавил fa-spin для вращения
-        desc.innerText = message;
-        closeBtn.style.display = 'none';
-    } 
-    else if (type === 'success') {
-        title.innerText = "Success!";
-        icon.innerHTML = '<i class="fas fa-check-circle" style="color: #00ff88; font-size: 2rem;"></i>';
-        desc.innerText = message;
-        closeBtn.style.display = 'block';
-    } 
-    else if (type === 'error') {
-        title.innerText = "Error";
-        icon.innerHTML = '<i class="fas fa-times-circle" style="color: #ff4d4d; font-size: 2rem;"></i>';
-        desc.innerText = message;
-        closeBtn.style.display = 'block';
-    }
-
-    if (txHash && explorerUrl) {
-        linkHolder.innerHTML = `<a href="${explorerUrl}/tx/${txHash}" target="_blank" style="color: #00f2ff; text-decoration: none;">View on Explorer <i class="fas fa-external-link-alt"></i></a>`;
-    }
-
-    // 3. ЗАПУСК ЧЕРЕЗ ТАЙМАУТ
-    // Это заставляет браузер понять, что модалка "новая"
-    setTimeout(() => {
-        modal.style.display = 'flex'; // Или то состояние, которое нужно для центрирования
-        modal.classList.remove('hidden');
-    }, 10);
-}
-
-/** Закрывает модальное окно транзакции */
-function closeModal() {
-    const modal = document.getElementById('txModal');
-    if (modal) {
-        modal.classList.add('hidden');
-        // Очищаем инлайновый стиль, чтобы не мешать следующему открытию
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 300); // 300ms — если у тебя есть анимация плавного исчезновения
-    }
-}
-
-
-
-
-// ==========================================
-// 6. СЛУШАТЕЛИ И ОБРАБОТЧИКИ СОБЫТИЙ
-// ==========================================
-
-// Калькулятор: пересчет MIRTA при вводе суммы ETH
-document.getElementById('mintAmountEth').addEventListener('input', function() {
-    const val = this.value;
-    if (val > 0 && currentPriceWei > 0n) {
-        const weiToPay = ethers.parseEther(val.toString());
-        const amount = weiToPay / currentPriceWei; 
-        document.getElementById('calcOutput').innerText = `${amount.toString()} MIRTA`;
-    } else {
-        document.getElementById('calcOutput').innerText = "0 MIRTA";
-    }
-});
-
-// Кнопки управления
-document.getElementById('connect-btn').onclick = connect;
-document.getElementById('mintBtn').onclick = mintToken;
-
-// Логика выбора сети (dropdown)
-const networkBtn = document.getElementById('current-network');
-const networkList = document.getElementById('network-list');
-
-if (networkBtn && networkList) {
-    networkBtn.onclick = function(e) {
-        e.stopPropagation();
-        networkList.classList.toggle('show');
-    };
-}
-
-if (networkList) {
-    networkList.onclick = async (e) => {
-        const target = e.target.closest('a');
-        if (!target) return;
-        e.preventDefault();
-        networkList.classList.remove('show');
-
-        const chainId = target.getAttribute('data-chain-id');
-        await switchNetwork(chainId); // Вызываем нашу новую функцию
-    };
-}
-
-// Исправленная универсальная функция переключения
-async function switchNetwork(targetChainId) {
-    const config = CONTRACT_CONFIG[Number(targetChainId)];
-    if (!config) {
-        console.error("Network configuration not found for ID:", targetChainId);
-        return;
-    }
-
-    const hexChainId = config.chainIdHex || '0x' + Number(targetChainId).toString(16);
-
-    try {
-        // 1. Пытаемся просто переключить
-        await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: hexChainId }],
-        });
-    } catch (switchError) {
-        // 2. Если сети нет в кошельке (ошибка 4902), предлагаем добавить
-        if (switchError.code === 4902 || switchError.code === -32603) {
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [{
-                        chainId: hexChainId,
-                        chainName: config.networkName,
-                        rpcUrls: [config.rpcUrl],
-                        nativeCurrency: { 
-                            name: config.nativeTicker, 
-                            symbol: config.nativeTicker, 
-                            decimals: 18 
-                        },
-                        blockExplorerUrls: [config.explorerUrl]
-                    }]
-                });
-            } catch (addError) {
-                console.error("User rejected adding the network");
-            }
-        }
-    }
-}
-
-// Запуск инициализации при загрузке
-window.addEventListener('load', init);
-
-// Закрытие выпадающего списка при клике в любое место
-window.onclick = () => { if(networkList) networkList.classList.remove('show'); };
-
 
 function showSection(sectionId, element) {
     // 1. Находим все блоки контента и скрываем их
@@ -486,37 +376,128 @@ function showSection(sectionId, element) {
     }
 }
 
-function triggerModal(title, message, type = 'info') {
-    // 1. Сначала открываем модалку, используя твою функцию
-    if (typeof showGMProcessingModal === "function") {
-        showGMProcessingModal(true); 
-    } else {
-        const statusModal = document.getElementById('statusModal');
-        if (statusModal) statusModal.style.display = 'flex';
+
+// ==========================================
+// 5. МОДАЛЬНЫЕ ОКНА И UI ВЗАИМОДЕЙСТВИЕ
+// ==========================================
+
+function openModal(type, message, txHash = null, extra = {}) {
+    const modal = document.getElementById('statusModal'); // Твой новый ID
+    const loader = document.getElementById('statusLoader');
+    const title = document.getElementById('statusTitle');
+    const msg = document.getElementById('statusMessage');
+    const txInfo = document.getElementById('txInfo');
+    const stakedInfo = document.getElementById('stakedAmountInfo');
+    const link = document.getElementById('explorerLink');
+    const closeBtn = document.getElementById('statusCloseBtn');
+
+    if (!modal) return;
+
+    // Сброс состояния
+    modal.style.display = 'flex';
+    txInfo.style.display = 'none';
+    if (stakedInfo) stakedInfo.parentElement.style.display = 'none';
+
+    // Получаем URL эксплорера
+    const chainId = window.ethereum ? Number(window.ethereum.chainId) : null;
+    const config = chainId ? CONTRACT_CONFIG[chainId] : null;
+    const explorerUrl = config ? config.explorerUrl : "";
+
+    if (type === 'loading') {
+        title.innerText = "Processing...";
+        title.style.color = "#00f2ff";
+        loader.style.display = 'block';
+        closeBtn.style.display = 'none';
+    } 
+    else if (type === 'success') {
+        title.innerText = "Success!";
+        title.style.color = "#00ff88";
+        loader.style.display = 'none';
+        closeBtn.style.display = 'block';
+    } 
+    else if (type === 'error') {
+        title.innerText = "Error";
+        title.style.color = "#ff4d4d";
+        loader.style.display = 'none';
+        closeBtn.style.display = 'block';
     }
 
-    // 2. Делаем небольшую задержку (0.1 сек), чтобы твой старый код 
-    // успел отработать, а мы ПЕРЕКРЫЛИ его текст своим
-    setTimeout(() => {
-        const modalTitle = document.getElementById('modalTitle');
-        const modalDesc = document.getElementById('modalDesc');
-        
-        if (modalTitle && modalDesc) {
-            // Подставляем наш текст (например, "Empty Fields")
-            modalTitle.innerText = title;
-            modalDesc.innerText = message;
+    msg.innerHTML = message;
 
-            // Стилизация цвета
-            if (type === 'error') {
-                modalTitle.style.color = "#ff4a4a"; // Красный для ошибок
-            } else {
-                modalTitle.style.color = "#00f2ff"; // Твой фирменный неон
-            }
+    // Если есть транзакция, показываем блок инфо
+    if (txHash && explorerUrl) {
+        txInfo.style.display = 'block';
+        link.href = `${explorerUrl}/tx/${txHash}`;
+        
+        // Если это стейкинг, показываем сумму
+        if (extra.stakedAmount) {
+            stakedInfo.parentElement.style.display = 'block';
+            stakedInfo.innerText = extra.stakedAmount;
         }
-    }, 100); 
+    }
+}
+
+function closeStatusModal() {
+    const modal = document.getElementById('statusModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Для совместимости со старыми вызовами в коде
+function closeModal() {
+    closeStatusModal();
+}
+
+function triggerModal(title, message, type = 'info') {
+    const modalType = (type === 'error') ? 'error' : 'success';
+    openModal(modalType, message);
+    document.getElementById('statusTitle').innerText = title;
 }
 
 
+// ==========================================
+// 6. СЛУШАТЕЛИ И ОБРАБОТЧИКИ СОБЫТИЙ
+// ==========================================
+
+// Калькулятор: пересчет MIRTA при вводе суммы ETH
+
+document.getElementById('mintAmountEth').addEventListener('input', function() {
+    const val = this.value;
+    if (val > 0 && currentPriceWei > 0n) {
+        const weiToPay = ethers.parseEther(val.toString());
+        const amount = weiToPay / currentPriceWei; 
+        document.getElementById('calcOutput').innerText = `${amount.toString()} MIRTA`;
+    } else {
+        document.getElementById('calcOutput').innerText = "0 MIRTA";
+    }
+});
+
+document.getElementById('connect-btn').onclick = connect;
+document.getElementById('mintBtn').onclick = mintToken;
+
+const networkBtn = document.getElementById('current-network');
+const networkList = document.getElementById('network-list');
+
+if (networkBtn && networkList) {
+    networkBtn.onclick = function(e) {
+        e.stopPropagation();
+        networkList.classList.toggle('show');
+    };
+}
+
+if (networkList) {
+    networkList.onclick = async (e) => {
+        const target = e.target.closest('a');
+        if (!target) return;
+        e.preventDefault();
+        networkList.classList.remove('show');
+
+        const chainId = target.getAttribute('data-chain-id');
+        await switchNetwork(chainId);
+    };
+}
+
+window.addEventListener('load', init);
+window.onclick = () => { if(networkList) networkList.classList.remove('show'); };
 
 // Универсальное закрытие модалок при клике на темный фон (Overlay)
 window.addEventListener('click', function(event) {

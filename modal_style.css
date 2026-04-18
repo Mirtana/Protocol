@@ -1,13 +1,12 @@
 /* Модульное Окно Для Минта */
-
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; 
     width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85);
     display: flex; 
-    align-items: center; /* Центр по вертикали */
-    justify-content: center; /* Центр по горизонтали */
+    align-items: center;
+    justify-content: center;
     z-index: 1000; 
 }
 .modal-overlay.hidden { 
@@ -19,13 +18,12 @@
     background: #0d1117;
     border: 1px solid rgba(0, 255, 255, 0.3); 
     border-radius: 20px;
-    max-width: 340px; /* Немного увеличим для запаса */
+    max-width: 340px;
     padding: 30px 25px; 
-    /* margin: 20% auto; <-- УДАЛИ ЭТУ СТРОКУ */
     text-align: center; 
     width: 90%;
     color: white;
-    height: auto !important; /* Добавь это */
+    height: auto !important;
 }
 .close-x {
     position: absolute; 
@@ -94,20 +92,57 @@
     } 
 }
 
-/*-----------------------------------------------------------------------------------------------------------------------
+/*--------------------------------------------------
+
+/* Mint nft Основной контейнер контента внутри модалки */
+.status-modal-content {
+    overflow: hidden !important;
+    max-height: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.status-modal-content::-webkit-scrollbar {
+    display: none;
+}
+
+
+#statusModal .status-modal-content {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 20px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: visible !important;
+}
+
+
+/* 3. Убираем скроллбары для всех браузеров внутри модалки */
+#statusModal *::-webkit-scrollbar {
+    display: none;
+}
+
+#statusModal * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 
 
 /* Модульное Окно Для Стейкинга */
 
 #statusModal.modal {
-    display: none; /* Будет flex при показе */
+    display: none;
     position: fixed;
     z-index: 9999;
     left: 0; top: 0;
     width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
-    /* Добавь эти две строки ниже: */
     align-items: center;
     justify-content: center;
 }
@@ -118,11 +153,10 @@
     border-radius: 20px;
     max-width: 340px; 
     padding: 30px 25px;
-    /* margin: 20% auto; <-- УДАЛИ ЭТУ СТРОКУ */
     text-align: center;
     width: 90%;
     color: white;
-    height: auto !important; /* Добавь это */
+    height: auto !important;
 }
 #statusCloseBtn {
     display: block;
@@ -188,18 +222,22 @@
 #statusMessage {
     color: #8a8d91;
     line-height: 1.5;
+    
+    margin-bottom: 10px !important; 
+    padding: 0 !important;
+  
 }
 
 #statusMessage, #modalDesc {
     word-wrap: break-word;
     overflow-wrap: break-word;
-    max-height: 300px; /* На всякий случай */
-    overflow-y: auto;  /* Если текст будет совсем гигантским, появится скролл внутри */
+    max-height: 300px;
+    overflow-y: auto;  
     margin-bottom: 10px;
 }
 
 /* АДАПТИВ МОДУЛЬНОГО ОКНА "МИНТА" ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .modal-icon {
         font-size: 42px; /* Чуть меньше иконка */
         margin-bottom: 10px;

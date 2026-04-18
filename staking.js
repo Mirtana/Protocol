@@ -19,6 +19,7 @@ const ADDRESSES = {
 
 const EXPLORERS = {
     46630: "https://explorer.testnet.chain.robinhood.com/tx/",
+    5042002: "https://testnet.arcscan.app/tx/",
     11155111: "https://sepolia.etherscan.io/tx/"
 };
 
@@ -37,11 +38,12 @@ let selectedTier = 0;
 let STAKING_ADDRESS;
 let MIRTA_TOKEN_ADDRESS;
 
+
+
 // ==========================================
 // 2. СЛУЖЕБНЫЕ ФУНКЦИИ И ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 
-/** Подтягивает нужные адреса контрактов в зависимости от сети кошелька */
 async function updateContractAddresses() {
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
@@ -57,48 +59,16 @@ async function updateContractAddresses() {
     return true;
 }
 
-/** Главная инициализация: подключает провайдер, выбирает сеть и загружает данные пользователя */
-async function initStaking() {
-    if (window.ethereum) {
-        try {
-            provider = new ethers.BrowserProvider(window.ethereum);
-            globalSigner = await provider.getSigner();
-            
-            const network = await provider.getNetwork();
-            const chainId = Number(network.chainId);
-            
-            if (ADDRESSES[chainId]) {
-                STAKING_ADDRESS = ADDRESSES[chainId].staking;
-                MIRTA_TOKEN_ADDRESS = ADDRESSES[chainId].token;
-                console.log(`✅ Connected to ${chainId}! Staking: ${STAKING_ADDRESS}`);
-            } else {
-                console.error("❌ Unsupported network:", chainId);
-                return; 
-            }
-
-            stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, globalSigner);
-            await loadUserStakes();
-        } catch (e) { 
-            console.error("Init Error:", e); 
-        }
-    }
-}
-
 async function setMaxStake() {
-    // Проверка подключения
-    if (!userAccount || !signer) {
-        console.error("Wallet not connected");
-        return;
-    }
-
+    if (!userAccount || !signer) return;
     try {
-        // 1. Адрес твоего токена MIRTA (подставь свой актуальный адрес)
-        const MIRTA_TOKEN_ADDRESS = "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6"; 
-        
-        // 2. Минимальный ABI для получения баланса
+        // Берем адрес из уже определенной глобальной переменной
+        const tokenAddr = MIRTA_TOKEN_ADDRESS; 
+        if (!tokenAddr) return;
+
         const minABI = ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"];
+        const tokenContract = new ethers.Contract(tokenAddr, minABI, provider);
         
-        const tokenContract = new ethers.Contract(MIRTA_TOKEN_ADDRESS, minABI, provider);
 
         // 3. Получаем баланс и количество знаков
         const [balance, decimals] = await Promise.all([
@@ -123,11 +93,12 @@ async function setMaxStake() {
     }
 }
 
+
+
 // ==========================================
 // 3. ФУНКЦИИ КАЛЬКУЛЯТОРА (UI LOGIC)
 // ==========================================
 
-/** Обновляет расчет доходности в реальном времени при вводе суммы */
 function updateRewardCalc() {
     const amountInput = document.getElementById('stakeAmount');
     const rewardSpan = document.getElementById('calculatedReward');
@@ -163,7 +134,6 @@ function updateRewardCalc() {
     }
 }
 
-/** Дублирующая функция для отображения проекции (если используется отдельный элемент) */
 function calculateAndDisplayRewards() {
     const amountInput = document.getElementById('stakeAmount');
     const rewardDisplay = document.getElementById('rewardProjectionDisplay');
@@ -195,41 +165,38 @@ function calculateAndDisplayRewards() {
     }
 }
 
+
+
 // ==========================================
 // 4. ОСНОВНЫЕ БЛОКЧЕЙН-ОПЕРАЦИИ (STAKE/UNSTAKE)
 // ==========================================
 
-/** Функция отправки токенов в стейкинг (с проверкой баланса и Approve) */
 async function stakeTokens() {
     const amountInput = document.getElementById('stakeAmount').value;
+    
+    // Проверка ввода
     if (!amountInput || Number(amountInput) <= 0) {
-        return alert("Введите сумму больше 0");
+        return alert("Please enter an amount greater than 0");
     }
 
-    const modal = document.getElementById('statusModal');
-    const title = document.getElementById('statusTitle');
-    const msg = document.getElementById('statusMessage');
-    const loader = document.getElementById('statusLoader');
-    const txInfo = document.getElementById('txInfo');
-    const closeBtn = document.getElementById('statusCloseBtn');
-    const explorerLink = document.getElementById('explorerLink');
-    const stakedAmountDisplay = document.getElementById('stakedAmountInfo');
-
-    modal.style.display = 'flex';
-    loader.style.display = 'block';
-    txInfo.style.display = 'none';
-    closeBtn.style.display = 'none';
-    title.innerText = "Processing...";
-    msg.innerText = "Preparing a transaction...";
+    // Проверка глобальных переменных (из ADDRESSES)
+    if (!STAKING_ADDRESS || !MIRTA_TOKEN_ADDRESS) {
+        return alert("Contract addresses not found. Please check your network connection.");
+    }
 
     try {
+        // 1. Инициализация провайдера и сигнера
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
-        const stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
-
-        const amountWei = ethers.parseUnits(amountInput, 18);
         const userAddress = await signer.getAddress();
+        
+        // Открываем модалку: Начало процесса
+        if (window.openModal) {
+            window.openModal('loading', 'Preparing your staking transaction...');
+        }
 
+        // 2. Настройка контрактов
+        const stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
         const tokenAbi = [
             "function approve(address spender, uint256 amount) external returns (bool)",
             "function allowance(address owner, address spender) external view returns (uint256)",
@@ -237,172 +204,135 @@ async function stakeTokens() {
         ];
         const tokenContract = new ethers.Contract(MIRTA_TOKEN_ADDRESS, tokenAbi, signer);
 
-        const balance = await tokenContract.balanceOf(userAddress);
-        const allowance = await tokenContract.allowance(userAddress, STAKING_ADDRESS);
+        const amountWei = ethers.parseUnits(amountInput, 18);
 
+        // 3. Проверка баланса
+        const balance = await tokenContract.balanceOf(userAddress);
         if (balance < amountWei) {
-            throw new Error(`Not enough tokens. Balance: ${ethers.formatUnits(balance, 18)} MIRTA`);
+            throw new Error(`Insufficient balance. You have ${ethers.formatUnits(balance, 18)} MIRTA`);
         }
 
+        // 4. Проверка и выполнение Approval (Шаг 1)
+        const allowance = await tokenContract.allowance(userAddress, STAKING_ADDRESS);
         if (allowance < amountWei) {
-            title.innerText = "Step 1/2: Approval";
-            msg.innerText = "Confirm permission to spend tokens...";
+            if (window.openModal) {
+                window.openModal('loading', 'Step 1/2: Approving MIRTA tokens. Please confirm in your wallet...');
+            }
             const approveTx = await tokenContract.approve(STAKING_ADDRESS, amountWei);
             await approveTx.wait();
+            console.log("Approval confirmed");
         }
 
-        title.innerText = "Step 2/2: Staking";
-        msg.innerText = "Confirm staking in your wallet...";
+        // 5. Выполнение Staking (Шаг 2)
+        if (window.openModal) {
+            window.openModal('loading', 'Step 2/2: Confirming stake in your wallet...');
+        }
 
-        const tx = await stakingContract.stake(amountWei, Number(selectedTier), {
-            gasLimit: 1200000n,
-        });
+        const tx = await stakingContract.stake(amountWei, Number(selectedTier));
 
-        title.innerText = "Finalizing...";
-        msg.innerText = "Waiting for confirmation on the blockchain...";
+        // 6. Ожидание подтверждения в блокчейне
+        if (window.openModal) {
+            window.openModal('loading', 'Transaction sent! Finalizing on blockchain...', tx.hash);
+        }
 
         await tx.wait();
 
-        const network = await provider.getNetwork();
-        const chainId = Number(network.chainId);
-        const explorerBase = EXPLORERS[chainId] || "https://sepolia.etherscan.io/tx/";
+        // 7. УСПЕХ
+        if (window.openModal) {
+            window.openModal('success', `Successfully staked ${amountInput} MIRTA! Your rewards start accumulating now.`, tx.hash);
+        }
 
-        txInfo.style.display = 'block';
-        stakedAmountDisplay.innerText = amountInput;
-        explorerLink.href = `${explorerBase}${tx.hash}`;
+        // Обновляем данные на странице
+        if (typeof loadUserStakes === 'function') loadUserStakes();
 
-        title.innerText = "Success!";
-        msg.innerText = "Successfully staked!";
-        loader.style.display = 'none';
-        closeBtn.style.display = 'block';
-
-        loadUserStakes();
     } catch (error) {
-        console.error(error);
-        let errorMessage = error.reason || error.message || "Error during execution";
-        title.innerText = "Error";
-        msg.innerText = errorMessage;
-        loader.style.display = 'none';
-        closeBtn.style.display = 'block';
+        console.error("Staking error:", error);
+        
+        // Закрываем модалку или показываем ошибку
+        if (error.code === 4001) {
+            // Если пользователь отменил транзакцию сам — просто закрываем
+            if (window.closeStatusModal) window.closeStatusModal();
+            alert("Transaction rejected by user.");
+        } else {
+            // Если произошла техническая ошибка — показываем в модалке
+            const errorMessage = error.reason || error.message || "Staking failed. Please try again.";
+            if (window.openModal) {
+                window.openModal('error', errorMessage);
+            }
+        }
     }
 }
 
-/** Вывод токенов и наград (основная функция с красивым итоговым окном) */
 async function unstake(tier) {
-    const modal = document.getElementById('statusModal');
-    const title = document.getElementById('statusTitle');
-    const msg = document.getElementById('statusMessage');
-    const loader = document.getElementById('statusLoader');
-    const txInfo = document.getElementById('txInfo');
-    const closeBtn = document.getElementById('statusCloseBtn');
-    const explorerLink = document.getElementById('explorerLink');
-    const stakedAmountDisplay = document.getElementById('stakedAmountInfo');
-
-    modal.style.display = 'block';
-    loader.style.display = 'block';
-    txInfo.style.display = 'none';
-    closeBtn.style.display = 'none';
-    title.innerText = "Unstaking Process";
-    msg.innerText = "Reading stake data...";
-
     try {
+        // 1. Проверка инициализации
         if (!stakingContract) await initStaking();
         const userAddress = await globalSigner.getAddress();
 
+        // Открываем модалку в режиме загрузки
+        if (window.openModal) {
+            window.openModal('loading', 'Reading stake data and calculating rewards...');
+        }
+
+        // 2. Получаем данные о стейке до транзакции (для финального отчета)
         const stakeData = await stakingContract.userStakes(userAddress, tier);
         const rewardAmount = await stakingContract.calculateReward(userAddress, tier);
         
         const amountLocked = ethers.formatUnits(stakeData.amount, 18);
         const amountReward = ethers.formatUnits(rewardAmount, 18);
+        const totalAmount = (Number(amountLocked) + Number(amountReward)).toFixed(4);
 
-        msg.innerText = "Please confirm the transaction in your wallet...";
+        // 3. Запрос подписи в кошельке
+        if (window.openModal) {
+            window.openModal('loading', 'Please confirm the Unstake & Claim transaction in your wallet...');
+        }
+
         const tx = await stakingContract.unstake(tier);
 
-        title.innerText = "Transaction Sent";
-        msg.innerText = "Withdrawing your tokens and rewards...";
-        txInfo.style.display = 'block';
-        stakedAmountDisplay.parentElement.style.display = 'none'; 
-
-        const network = await globalSigner.provider.getNetwork();
-        const baseTxUrl = EXPLORERS[Number(network.chainId)] || "https://sepolia.etherscan.io/tx/";
-        explorerLink.href = `${baseTxUrl}${tx.hash}`;
+        // 4. Ожидание подтверждения
+        if (window.openModal) {
+            window.openModal('loading', 'Processing withdrawal... Your tokens are on the way.', tx.hash);
+        }
 
         await tx.wait();
 
-        title.innerText = "Success!";
-        msg.innerHTML = `
-            <div style="text-align: left; background: #1a1d23; padding: 15px; border-radius: 12px; border: 1px solid rgba(0,242,255,0.2); margin-top: 10px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
-                    <span style="color: #8a8d91;">Returned Deposit:</span>
-                    <span style="color: #fff; font-weight: bold;">${Number(amountLocked).toLocaleString()} MIRTA</span>
+        // 5. УСПЕХ (с твоим кастомным HTML-отчетом)
+        if (window.openModal) {
+            const successHtml = `
+                <p style="margin-bottom: 15px;">Tokens and rewards successfully withdrawn!</p>
+                <div style="text-align: left; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid rgba(0,242,255,0.2);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                        <span style="color: #8a8d91;">Returned Deposit:</span>
+                        <span style="color: #fff; font-weight: bold;">${Number(amountLocked).toLocaleString()} MIRTA</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; color: #00f2ff; font-size: 14px;">
+                        <span>Earned Reward:</span>
+                        <span style="font-weight: bold;">+${Number(amountReward).toFixed(4)} MIRTA</span>
+                    </div>
+                    <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
+                        <span>Total Received:</span>
+                        <span style="color: #fff;">${totalAmount}</span>
+                    </div>
                 </div>
-                <div style="display: flex; justify-content: space-between; color: #00f2ff; font-size: 14px;">
-                    <span>Earned Reward:</span>
-                    <span style="font-weight: bold;">+${Number(amountReward).toFixed(4)} MIRTA</span>
-                </div>
-                <div style="margin-top: 10px; border-top: 1px solid #333; pt: 10px; display: flex; justify-content: space-between; font-weight: bold;">
-                    <span>Total Received:</span>
-                    <span style="color: #fff;">${(Number(amountLocked) + Number(amountReward)).toFixed(2)}</span>
-                </div>
-            </div>
-        `;
+            `;
+            window.openModal('success', successHtml, tx.hash);
+        }
 
-        loader.style.display = 'none';
-        closeBtn.style.display = 'block';
-        loadUserStakes();
+        // Обновляем список стейков на странице
+        if (typeof loadUserStakes === 'function') loadUserStakes();
+
     } catch (e) {
-        console.error(e);
-        title.innerText = "Unstake Failed";
-        msg.innerText = e.reason || e.message || "Transaction rejected.";
-        loader.style.display = 'none';
-        closeBtn.style.display = 'block';
-    }
-}
-
-/** Упрощенная версия вывода (альтернативная) */
-async function unstakeTokens(tier) {
-    // Реализация аналогична unstake, но без детального вывода сумм в конце
-    const modal = document.getElementById('statusModal');
-    const title = document.getElementById('statusTitle');
-    const msg = document.getElementById('statusMessage');
-    const loader = document.getElementById('statusLoader');
-    const txInfo = document.getElementById('txInfo');
-    const closeBtn = document.getElementById('statusCloseBtn');
-    const explorerLink = document.getElementById('explorerLink');
-
-    modal.style.display = 'block';
-    loader.style.display = 'block';
-    txInfo.style.display = 'none';
-    closeBtn.style.display = 'none';
-    title.innerText = "Unstaking...";
-    msg.innerText = "Please confirm the Unstake & Claim transaction in your wallet.";
-
-    try {
-        if (!stakingContract) await initStaking();
-        const tx = await stakingContract.unstake(tier);
-        title.innerText = "Processing Unstake";
-        msg.innerText = "Withdrawing your tokens and rewards to your wallet...";
+        console.error("Unstake error:", e);
         
-        const network = await globalSigner.provider.getNetwork();
-        const chainId = Number(network.chainId);
-        const baseTxUrl = EXPLORERS[chainId] || "https://sepolia.etherscan.io/tx/";
-        
-        txInfo.style.display = 'block';
-        document.getElementById('stakedAmountInfo').parentElement.style.display = 'none'; 
-        explorerLink.href = `${baseTxUrl}${tx.hash}`;
-
-        await tx.wait();
-        title.innerText = "Success!";
-        msg.innerText = "Tokens and rewards have been sent to your wallet.";
-        loader.style.display = 'none';
-        closeBtn.style.display = 'block';
-        loadUserStakes();
-    } catch (e) {
-        console.error(e);
-        title.innerText = "Unstake Failed";
-        msg.innerText = e.reason || e.message || "Transaction rejected.";
-        loader.style.display = 'none';
-        closeBtn.style.display = 'block';
+        if (e.code === 4001) {
+            if (window.closeStatusModal) window.closeStatusModal();
+            alert("Transaction rejected.");
+        } else {
+            const errorMsg = e.reason || e.message || "Unstake failed. Make sure the lock period has ended.";
+            if (window.openModal) {
+                window.openModal('error', errorMsg);
+            }
+        }
     }
 }
 
@@ -410,7 +340,6 @@ async function unstakeTokens(tier) {
 // 5. ОТОБРАЖЕНИЕ АКТИВНЫХ СТЕЙКОВ И ТАЙМЕРЫ
 // ==========================================
 
-/** Загружает из контракта все активные стейки пользователя и рисует карточки */
 async function loadUserStakes() {
     if (!globalSigner || !stakingContract) return;
     const container = document.getElementById('userStakesList');
@@ -463,7 +392,6 @@ async function loadUserStakes() {
     } catch (e) { console.error(e); }
 }
 
-/** Запускает ежесекундный отсчет времени для заблокированных стейков */
 function startGlobalTimers() {
     if (window.stakeTimerInterval) clearInterval(window.stakeTimerInterval);
 
@@ -493,11 +421,11 @@ function startGlobalTimers() {
     }, 1000);
 }
 
+
 // ==========================================
 // 6. UI ИНТЕРФЕЙС И СОБЫТИЯ
 // ==========================================
 
-/** Отрисовывает сетку тарифных планов при загрузке страницы */
 function initStakingUI() {
     const grid = document.getElementById('stakingPlans');
     if (!grid) return;
@@ -507,7 +435,6 @@ function initStakingUI() {
         </div>`).join('');
 }
 
-/** Переключает выбранный пользователем тарифный план */
 function selectTier(id, element) {
     selectedTier = id;
     document.querySelectorAll('.plan-card').forEach(el => el.classList.remove('active'));
@@ -515,10 +442,11 @@ function selectTier(id, element) {
     updateRewardCalc();
 }
 
-/** Закрывает модальное окно статуса */
 function closeStatusModal() {
     document.getElementById('statusModal').style.display = 'none';
 }
+
+
 
 // ==========================================
 // 7. СЛУШАТЕЛИ СОБЫТИЙ И ЗАПУСК

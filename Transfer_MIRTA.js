@@ -1,4 +1,3 @@
-// Выносим конфиг в глобальную область, чтобы обе функции имели к нему доступ
 const MIRTA_CONFIG = {
     // Robinhood Testnet (ChainID: 46630)
     46630: {
@@ -13,7 +12,7 @@ const MIRTA_CONFIG = {
 };
 
 async function setMaxTransfer() {
-    if (!userAccount) return;
+    if (!userAccount || !provider) return;
     try {
         const network = await provider.getNetwork();
         const chainId = Number(network.chainId);
@@ -32,12 +31,10 @@ async function setMaxTransfer() {
             contract.decimals()
         ]);
 
-        // Используем универсальный способ форматирования для ethers v6/v5
-        const formattedBalance = ethers.formatUnits 
-            ? ethers.formatUnits(balance, decimals) 
-            : ethers.utils.formatUnits(balance, decimals);
+        const formattedBalance = ethers.formatUnits(balance, decimals);
+        const input = document.getElementById('transferAmount');
+        if (input) input.value = formattedBalance;
 
-        document.getElementById('transferAmount').value = formattedBalance;
     } catch (e) {
         console.error("Balance fetch failed", e);
     }
@@ -47,6 +44,7 @@ async function sendMirtaTokens() {
     const recipient = document.getElementById('transferAddress').value;
     const amount = document.getElementById('transferAmount').value;
 
+    // Валидация
     if (!ethers.isAddress(recipient)) return alert("Invalid recipient address!");
     if (!amount || amount <= 0) return alert("Enter valid amount!");
 
@@ -60,53 +58,55 @@ async function sendMirtaTokens() {
             return;
         }
 
-        const abi = ["function transfer(address to, uint256 amount) returns (bool)", "function decimals() view returns (uint8)"];
+        // 1. Открываем модалку инициализации
+        if (window.openModal) {
+            window.openModal('loading', `Preparing to send ${amount} MIRTA to ${recipient.substring(0, 8)}...`);
+        }
+
+        const abi = [
+            "function transfer(address to, uint256 amount) returns (bool)", 
+            "function decimals() view returns (uint8)"
+        ];
         const contract = new ethers.Contract(config.address, abi, signer);
 
         const decimals = await contract.decimals();
         const parsedAmount = ethers.parseUnits(amount, decimals);
 
-        // 1. Показываем модалку загрузки
-        showGMProcessingModal(false); 
-        
-        
-        const modalBtn = document.getElementById('modalCloseBtn');
-        if (modalBtn) modalBtn.style.display = 'none'; 
-        
-        document.getElementById('modalTitle').innerText = "Sending MIRTA...";
-        document.getElementById('modalDesc').innerText = `Transferring ${amount} MIRTA to ${recipient.substring(0,6)}...`;
-
-        // 2. Отправка транзакции в кошелек
+        // 2. Запрос в кошельке
         const tx = await contract.transfer(recipient, parsedAmount);
         
-        // Меняем текст, пока ждем подтверждения в блокчейне
-        document.getElementById('modalDesc').innerText = "Transaction sent. Waiting for confirmation...";
+        // 3. Обновляем статус: Транзакция в блокчейне
+        if (window.openModal) {
+            window.openModal('loading', 'Transfer sent! Waiting for network confirmation...', tx.hash);
+        }
 
-        // 3. Ожидание майнинга блока
+        // 4. Ожидание подтверждения
         await tx.wait();
 
-        // 4. Показываем успех
-        const scanUrl = `${config.explorer}${tx.hash}`;
-        showGMSuccessModal(tx.hash, scanUrl);
-        
-        // Настраиваем финальный вид
-        document.getElementById('modalTitle').innerText = "Transfer Complete!";
-        document.getElementById('modalDesc').innerText = `Successfully sent ${amount} MIRTA.`;
-        
-        // Показываем кнопку ОК только теперь
-        if (modalBtn) modalBtn.style.display = 'block';
+        // 5. УСПЕХ
+        if (window.openModal) {
+            window.openModal('success', `Successfully transferred ${amount} MIRTA to ${recipient}`, tx.hash);
+        }
 
-        // Обновляем балансы в интерфейсе после перевода
+        // Очищаем поля ввода
+        document.getElementById('transferAddress').value = "";
+        document.getElementById('transferAmount').value = "";
+
+        // Обновляем балансы в интерфейсе
         if (typeof updateBalances === 'function') updateBalances();
 
     } catch (e) {
         console.error("Transfer failed", e);
-        closeModal(); 
         
         if (e.code === 4001) {
-            console.log("User cancelled transaction");
+            // Если отмена пользователем, закрываем модалку без ошибки
+            if (window.closeStatusModal) window.closeStatusModal();
         } else {
-            alert("Transaction failed! Check console.");
+            // Показываем ошибку через универсальную модалку
+            const errorMsg = e.reason || e.message || "Transaction failed. Please check your balance or gas.";
+            if (window.openModal) {
+                window.openModal('error', errorMsg);
+            }
         }
     }
 }

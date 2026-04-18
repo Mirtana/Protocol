@@ -1,4 +1,4 @@
-// 1. Твой объект с прямыми ссылками
+// 1. Твои ссылки
 const pinataLinks = {
     1: "https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeiefgqgikud4zzjqjwygpzk7r4tnbddxczxuv7digwscv5lnck5n74",
     2: "https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeias3gmfaj6532haybgotwmf3ixtvuyp2ktbhv5tobh43kwwysnili",
@@ -14,16 +14,31 @@ const pinataLinks = {
     12: "https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeiaprfe7pckfwui2xvwez5bbl77klw4nh75a5frveia7quolnxfrpm",
 };
 
-function createNFTCard(id, isOwned) {
+
+// const NETWORKS = {
+//     "0xB626": {
+//         nftAddress: "0xa37b518e9CC09FFb3280810Ff456999AC84D10cc",
+//         explorer: "https://explorer.testnet.chain.robinhood.com"
+//     },
+//     "0x4cef52": {
+//         nftAddress: "0x392a38398ab7358947caCC77F244A5ee1D6091f5",
+//         explorer: "https://testnet.arcscan.app"
+//     }
+// };
+
+
+function createNFTCard(id, isOwned, realTokenId = null) {
     const fullName = monthNames[id]; 
     const imagePath = pinataLinks[id]; 
 
     const statusClass = isOwned ? 'unlocked' : 'locked';
     const statusText = isOwned ? 'Unlocked' : 'Locked';
 
-    // ФИКС: Кнопка Mint Now теперь ведет на секцию минта NFT, а не токена
+    // Если у нас есть реальный ID из контракта, используем его, иначе ID месяца
+    const transferId = (realTokenId !== null) ? realTokenId : id;
+
     const actionButton = isOwned 
-        ? `<button onclick="prepareTransfer(${id}, '${fullName}')" class="btn-transfer-card">TRANSFER</button>`
+        ? `<button onclick="prepareTransfer(${transferId}, '${fullName}')" class="btn-transfer-card">TRANSFER</button>`
         : `<button onclick="showSection('nft-mint-section', this)" class="btn-mint-card">MINT NOW</button>`;
 
     return `
@@ -41,114 +56,173 @@ function createNFTCard(id, isOwned) {
 async function loadDashboard() {
     const grid = document.getElementById('nft-collection-grid');
     const countDisplay = document.getElementById('user-nft-count');
-    const networkDisplay = document.getElementById('current-network-name');
     if (!grid) return;
 
     try {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const userAddress = await signer.getAddress();
+        
         const network = await provider.getNetwork();
         const chainId = "0x" + network.chainId.toString(16).toLowerCase();
-        
         const currentConfig = NETWORKS[chainId];
         if (!currentConfig) return;
 
-        networkDisplay.innerText = (chainId === '0x4cef52') ? "ARC MAINNET" : "ROBINHOOD";
-        
         const nftContract = new ethers.Contract(currentConfig.nftAddress, NFT_ABI, signer);
+
+        // Получаем списки через новые функции твоего контракта
+        const userTokenIds = await nftContract.getUserNFTs(userAddress);
+        const userEditions = await nftContract.getUserEditions(userAddress);
+
+        // Создаем карту: какой месяц -> какой реальный ID токена
+        const ownershipMap = {};
+        userEditions.forEach((edition, index) => {
+            ownershipMap[Number(edition)] = Number(userTokenIds[index]);
+        });
 
         grid.innerHTML = '';
         let ownedCount = 0;
 
         for (let monthId = 1; monthId <= 12; monthId++) {
-            let isOwned = false;
-            try {
-                isOwned = await nftContract.hasEditionMinted(userAddress, monthId);
-                if (isOwned) {
-                    ownedCount++;
-                }
-            } catch (e) { 
-                console.error(`Error checking month ${monthId}:`, e);
-            }
-            grid.innerHTML += createNFTCard(monthId, isOwned);
+            const realId = ownershipMap[monthId];
+            const isOwned = (realId !== undefined);
+            
+            if (isOwned) ownedCount++;
+            
+            // Передаем realId в функцию создания карточки
+            grid.innerHTML += createNFTCard(monthId, isOwned, realId);
         }
         
-        countDisplay.innerText = ownedCount;
-
-        // --- ФИКС ДУБЛИРОВАНИЯ ---
-        const existingNotice = document.querySelector('.dashboard-notice.info-panel');
-        if (existingNotice) {
-            existingNotice.remove();
-        }
-
-        grid.insertAdjacentHTML('afterend', `
-            <div class="dashboard-notice info-panel">
-                <div class="panel-content">
-                    <span class="panel-icon">⚠️</span>
-                    <p class="panel-text">
-                        <b>LIMIT:</b> Each address is limited to minting only 12 unique NFTs (one for each month).<br>
-                        Transferring an asset does not restore the right to re-mint that month.
-                    </p>
-                </div>
-            </div>
-        `);
+        if (countDisplay) countDisplay.innerText = ownedCount;
         
     } catch (error) {
         console.error("Dashboard error:", error);
     }
 }
 
+// 1. Подготовка трансфера
 function prepareTransfer(tokenId, name) {
     const content = `
         <div class="transfer-box" style="text-align:center;">
-            <p style="margin-bottom: 15px; color: #fff;">Transfer <b>${name}</b></p>
-            <input type="text" id="destAddress" placeholder="0x... Recipient Address">
-            <button onclick="executeTransfer(${tokenId})" class="mint-btn" style="margin-top: 20px; width: 100%;">SEND ASSET</button>
+            <p style="margin-bottom: 15px; color: #fff; font-size: 14px;">
+                You are transferring <b>${name}</b><br>
+                <span style="color: #00f2ff; font-size: 12px;">Token ID: ${tokenId}</span>
+            </p>
+            <input type="text" id="destAddress" placeholder="0x... Recipient Address" 
+                   style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#1a1a1a; color:white; outline:none; font-size: 13px;">
+            <button onclick="executeTransfer(${tokenId}, '${name}')" class="mint-btn" 
+                    style="margin-top: 20px; width: 100%; cursor: pointer;">
+                SEND ASSET
+            </button>
         </div>
     `;
+
     updateModal("Transfer NFT", content, false);
+
+    // --- УПРАВЛЕНИЕ ВИЗУАЛОМ (чтобы не ломать другие функции) ---
+    const txInfo = document.getElementById("txInfo");
+    const closeBtn = document.getElementById("statusCloseBtn");
+
+    if (txInfo) txInfo.style.display = "none"; // Прячем блок стейкинга только сейчас
+    if (closeBtn) closeBtn.style.display = "none"; // Прячем кнопку закрытия
 }
 
-async function executeTransfer(tokenId) {
-    const to = document.getElementById('destAddress').value;
-    
+// 2. Выполнение транзакции
+async function executeTransfer(tokenId, name) {
+    const to = document.getElementById('destAddress').value.trim();
+    const txInfo = document.getElementById("txInfo");
+    const closeBtn = document.getElementById("statusCloseBtn");
+
     if (!ethers.isAddress(to)) {
-        alert("Invalid wallet address!");
+        updateModal("Error", "Invalid wallet address.", false);
+        if (closeBtn) closeBtn.style.display = "block";
         return;
     }
 
-    const nftName = monthNames[tokenId] || `NFT #${tokenId}`;
-
     try {
-        updateModal("Processing", "Please confirm transaction in your wallet...", true);
-        
+        updateModal("Processing", "Confirm transaction in your wallet...", true);
+
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const network = await provider.getNetwork();
         const chainId = "0x" + network.chainId.toString(16).toLowerCase();
-        
         const currentConfig = NETWORKS[chainId];
+        
         const nftContract = new ethers.Contract(currentConfig.nftAddress, NFT_ABI, signer);
+        const tx = await nftContract.safeTransferFrom(await signer.getAddress(), to, tokenId);
         
-        const tx = await nftContract.transferFrom(await signer.getAddress(), to, tokenId);
+        let explorerBase = currentConfig.explorer || "";
+        explorerBase = explorerBase.replace(/\/$/, ''); 
+        const explorerUrl = `${explorerBase}/${tx.hash}`;
         
-        updateModal("Pending", `Transferring <b>${nftName}</b>...<br><br>Hash: <small>${tx.hash}</small>`, true);
-        
-        await tx.wait();
-
-        const successMsg = `
-            Successfully sent <b>${nftName}</b>!<br>
-            <div style="margin-top:10px; font-size:0.8rem; opacity:0.8;">
-                TX: ${tx.hash.substring(0, 10)}...${tx.hash.substring(62)}
+        const pendingContent = `
+            <div style="text-align:center;">
+                <p>Transferring <b>${name}</b>...</p>
+                <p style="margin: 15px 0;"><small style="opacity:0.5; font-size:10px; word-break:break-all;">Hash: ${tx.hash}</small></p>
             </div>
         `;
-        
-        updateModal("Success", successMsg, false);
-        loadDashboard(); 
-        
+        updateModal("Pending", pendingContent, true);
+
+        // Показываем блок со ссылкой, но без текста "Staked"
+        if (txInfo) {
+            txInfo.style.display = "block";
+            const stakedText = txInfo.querySelector('p');
+            if (stakedText) stakedText.style.display = "none"; // Скрываем именно "Staked: 0 MIRTA"
+            
+            const link = document.getElementById("explorerLink");
+            if (link) {
+                link.href = explorerUrl;
+                link.style.display = "inline-block";
+            }
+        }
+
+        await tx.wait();
+
+        updateModal("Success", `<b>${name}</b> successfully transferred!`, false);
+        if (closeBtn) closeBtn.style.display = "block"; // Показываем кнопку в самом конце
+
+        setTimeout(() => { if (typeof loadDashboard === "function") loadDashboard(); }, 2000);
+
     } catch (e) {
         console.error(e);
-        updateModal("Error", e.reason || "Transaction failed or cancelled", false);
+        updateModal("Error", e.reason || "Transaction failed", false);
+        if (closeBtn) closeBtn.style.display = "block";
+        
+        // Возвращаем видимость тексту стейкинга для других функций при закрытии
+        const stakedText = txInfo?.querySelector('p');
+        if (stakedText) stakedText.style.display = "block";
     }
+}
+
+
+
+
+
+
+
+function updateModal(title, content, showLoader = false) {
+    const modal = document.getElementById("statusModal");
+    const titleEl = document.getElementById("statusTitle");
+    const messageEl = document.getElementById("statusMessage");
+    const loaderEl = document.getElementById("statusLoader");
+    const closeBtn = document.getElementById("statusCloseBtn");
+
+    if (!modal || !titleEl || !messageEl) {
+        console.error("Элементы модального окна не найдены в HTML!");
+        return;
+    }
+
+    titleEl.innerText = title;
+    messageEl.innerHTML = content;
+    
+    // Лоадер
+    if (loaderEl) loaderEl.style.display = showLoader ? "block" : "none";
+    
+    // Кнопка CLOSE
+    if (closeBtn) {
+        closeBtn.style.display = showLoader ? "none" : "block";
+        closeBtn.onclick = () => modal.style.display = "none";
+    }
+
+    modal.style.display = "flex";
 }
