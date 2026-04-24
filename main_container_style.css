@@ -84,7 +84,7 @@
 }
 
 .faucet-label {
-    color: #ffcc00;
+    color: #ffaa00; 
     filter: drop-shadow(0 0 5px #ffcc00);
     font-size: 20px;
     text-transform: uppercase;
@@ -281,7 +281,7 @@
     width: 100%;
     background: transparent;
     border: none;
-    color: #ffcc00;
+    color: #ffaa00; 
     filter: drop-shadow(0 0 5px #ffcc00);
     font-size: 12px;
     margin-top: 15px;

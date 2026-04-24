@@ -27,7 +27,14 @@
         10: "Mirtana October", 11: "Mirtana November", 12: "Mirtana December"
     };
 
-    // 2. Основная функция лайка
+    const escapeHTML = (str) =>
+        String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
     window.handleLikeRequest = async function(nftId) {
         if (typeof window.ethereum === 'undefined') {
             alert("Please install MetaMask!");
@@ -52,7 +59,6 @@
 
             const likePrice = ethers.parseUnits("1.0", 18);
 
-            // ШАГ 1: Проверка Allowance
             if (window.openModal) window.openModal('loading', 'Checking token allowance...');
 
             const allowance = await mirtaContract.allowance(userAddress, config.likesAddress);
@@ -63,26 +69,25 @@
                 await approveTx.wait();
             }
 
-            // ШАГ 2: Лайк
             if (window.openModal) window.openModal('loading', 'Step 2/2: Signing your Like on-chain...');
             const likeTx = await likesContract.likeNFT(nftId);
             
-            if (window.openModal) window.openModal('loading', 'Recording your Like forever...', likeTx.hash);
+            if (window.openModal) 
+                window.openModal('loading', 'Recording your Like forever...', likeTx.hash);
+
             await likeTx.wait();
 
-            // УСПЕХ
-            const nftName = NFT_NAMES_MAP[nftId] || `NFT #${nftId}`;
+            const nftName = escapeHTML(NFT_NAMES_MAP[nftId] || `NFT #${nftId}`);
             if (window.openModal) {
                 window.openModal('success', `
-                    <div style="text-align:center;">
-                        <div style="font-size: 30px; margin-bottom: 10px;">❤️</div>
-                        <p>Your like for <strong>${nftName}</strong> has been immortalized on the blockchain!</p>
-                        <p style="color: #ffcc00; font-size: 0.9em; margin-top: 10px;">1 Like = 1 MIRTA</p>
-                    </div>
-                `, likeTx.hash);
+                  <div style="text-align:center;">
+                      <div style="font-size: 30px; margin-bottom: 10px;">❤️</div>
+                      <p>Your like for <strong>${nftName}</strong> has been immortalized on the blockchain!</p>
+                      <p style="color: #ffcc00; font-size: 0.9em; margin-top: 10px;">1 Like = 1 MIRTA</p>
+                  </div>
+              `, likeTx.hash, {}, true);
             }
 
-            // Обновляем сердце в UI
             const heart = document.getElementById(`heart-${nftId}`);
             if (heart) heart.classList.add('active');
             
@@ -102,7 +107,6 @@
         }
     };
 
-    // 3. Синхронизация данных (Оптимизировано)
     async function syncLikesWithBlockchain() {
         if (!window.ethereum || typeof ethers === 'undefined') return;
         
@@ -138,7 +142,6 @@
         } catch (e) {}
     }
 
-    // Удалены лишние window.openStatusModal, window.updateStatusModal и т.д.
 
     window.addEventListener('load', syncLikesWithBlockchain);
     if (window.ethereum) {

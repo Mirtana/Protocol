@@ -1,10 +1,13 @@
 // --- КОНФИГУРАЦИЯ ---
-const GM_ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"count","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"GMSent","type":"event"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getGMStatus","outputs":[{"internalType":"bool","name":"canClaim","type":"bool"},{"internalType":"uint256","name":"timeLeft","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"gmCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastGM","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sayGM","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+
 const GM_ADDRESSES = {
     46630: "0x7C3732b3712536A4f3720Ab198b9C1cCB431f84C",
     5042002: "0x6B86aDdc998560f001ff4432DBc978adF06ba6Cb"
    
 };
+
+const GM_ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"count","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"GMSent","type":"event"},{"inputs":[{"internalType":"address","name":"user","type":"address"}],"name":"getGMStatus","outputs":[{"internalType":"bool","name":"canClaim","type":"bool"},{"internalType":"uint256","name":"timeLeft","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"gmCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"lastGM","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"sayGM","outputs":[],"stateMutability":"nonpayable","type":"function"}];
+
 
 let gmCountdown;
 
@@ -36,7 +39,7 @@ async function checkGMStatus() {
         if (status.canClaim) {
             if (btn) {
                 btn.innerText = "SAY GM!";
-                btn.disabled = false; // РАЗБЛОКИРУЕМ
+                btn.disabled = false;
                 btn.style.opacity = "1";
                 btn.style.cursor = "pointer";
             }
@@ -44,7 +47,7 @@ async function checkGMStatus() {
             if (gmCountdown) clearInterval(gmCountdown);
         } else {
             if (btn) {
-                btn.disabled = true; // БЛОКИРУЕМ
+                btn.disabled = true;
                 btn.style.opacity = "0.5";
                 btn.style.cursor = "not-allowed";
             }
@@ -81,12 +84,10 @@ function startGMTimer(seconds) {
 async function initGMContract() {
     const { chainId } = await provider.getNetwork();
     
-    // Берем адрес из твоего объекта на основе текущего chainId
     const contractAddress = GM_ADDRESSES[chainId];
 
     if (!contractAddress) {
         console.error("Unsupported network! Please switch to Robinhood or Arc.");
-        // Здесь можно вызвать switchNetwork(5042002) автоматически
         return;
     }
 
@@ -103,10 +104,10 @@ async function handleGM() {
         
         if (!gmAddr) return alert("Please switch to a supported network!");
 
+        await ensureCorrectNetwork();
+
         const contract = new ethers.Contract(gmAddr, GM_ABI, signer);
 
-        // ИСПОЛЬЗУЕМ НОВУЮ СТРУКТУРУ
-        // openModal(type, message, txHash, extra)
         if (window.openModal) {
             window.openModal('loading', 'Recording your daily GM activity... Please confirm in wallet.');
         }
@@ -115,17 +116,14 @@ async function handleGM() {
 
         const tx = await contract.sayGM();
         
-        // Обновляем модалку - показываем, что транзакция в сети
         if (window.openModal) {
-            const explorerUrl = getExplorerUrl(chainId, tx.hash);
             window.openModal('loading', 'GM Transaction sent! Waiting for blockchain confirmation...', tx.hash);
         }
 
         await tx.wait();
         
-        // УСПЕХ
         if (window.openModal) {
-            const explorerUrl = getExplorerUrl(chainId, tx.hash);
+            
             window.openModal('success', 'Your daily GM has been recorded forever!', tx.hash);
         }
 
@@ -138,8 +136,7 @@ async function handleGM() {
         if (error.code === 4001) {
             alert("Transaction rejected");
         } else {
-            // Можно вызвать openModal с типом 'error'
-            if (window.openModal) window.openModal('error', error.reason || "Transaction failed");
+            if (window.openModal) window.openModal('error', error.reason || error.message || "Transaction failed");
         }
         await checkGMStatus();
     }
@@ -153,7 +150,6 @@ function getExplorerUrl(chainId, hash) {
     return (explorers[chainId] || "") + hash;
 }
 
-// Глобальный доступ
 window.handleGM = handleGM;
 window.checkGMStatus = checkGMStatus;
 if (window.ethereum) {

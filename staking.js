@@ -62,7 +62,7 @@ async function updateContractAddresses() {
 async function setMaxStake() {
     if (!userAccount || !signer) return;
     try {
-        // Берем адрес из уже определенной глобальной переменной
+        
         const tokenAddr = MIRTA_TOKEN_ADDRESS; 
         if (!tokenAddr) return;
 
@@ -174,28 +174,29 @@ function calculateAndDisplayRewards() {
 async function stakeTokens() {
     const amountInput = document.getElementById('stakeAmount').value;
     
-    // Проверка ввода
-    if (!amountInput || Number(amountInput) <= 0) {
+    
+    if (!/^\d*\.?\d+$/.test(amountInput) || Number(amountInput) <= 0) {
         return alert("Please enter an amount greater than 0");
     }
-
-    // Проверка глобальных переменных (из ADDRESSES)
+    
+    
     if (!STAKING_ADDRESS || !MIRTA_TOKEN_ADDRESS) {
         return alert("Contract addresses not found. Please check your network connection.");
     }
 
     try {
-        // 1. Инициализация провайдера и сигнера
+        await ensureCorrectNetwork();
+
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const userAddress = await signer.getAddress();
         
-        // Открываем модалку: Начало процесса
+        
         if (window.openModal) {
             window.openModal('loading', 'Preparing your staking transaction...');
         }
 
-        // 2. Настройка контрактов
+        
         const stakingContract = new ethers.Contract(STAKING_ADDRESS, STAKING_ABI, signer);
         const tokenAbi = [
             "function approve(address spender, uint256 amount) external returns (bool)",
@@ -206,13 +207,11 @@ async function stakeTokens() {
 
         const amountWei = ethers.parseUnits(amountInput, 18);
 
-        // 3. Проверка баланса
         const balance = await tokenContract.balanceOf(userAddress);
         if (balance < amountWei) {
             throw new Error(`Insufficient balance. You have ${ethers.formatUnits(balance, 18)} MIRTA`);
         }
 
-        // 4. Проверка и выполнение Approval (Шаг 1)
         const allowance = await tokenContract.allowance(userAddress, STAKING_ADDRESS);
         if (allowance < amountWei) {
             if (window.openModal) {
@@ -223,38 +222,31 @@ async function stakeTokens() {
             console.log("Approval confirmed");
         }
 
-        // 5. Выполнение Staking (Шаг 2)
         if (window.openModal) {
             window.openModal('loading', 'Step 2/2: Confirming stake in your wallet...');
         }
 
         const tx = await stakingContract.stake(amountWei, Number(selectedTier));
 
-        // 6. Ожидание подтверждения в блокчейне
         if (window.openModal) {
             window.openModal('loading', 'Transaction sent! Finalizing on blockchain...', tx.hash);
         }
 
         await tx.wait();
 
-        // 7. УСПЕХ
         if (window.openModal) {
             window.openModal('success', `Successfully staked ${amountInput} MIRTA! Your rewards start accumulating now.`, tx.hash);
         }
 
-        // Обновляем данные на странице
         if (typeof loadUserStakes === 'function') loadUserStakes();
 
     } catch (error) {
         console.error("Staking error:", error);
         
-        // Закрываем модалку или показываем ошибку
         if (error.code === 4001) {
-            // Если пользователь отменил транзакцию сам — просто закрываем
             if (window.closeStatusModal) window.closeStatusModal();
             alert("Transaction rejected by user.");
         } else {
-            // Если произошла техническая ошибка — показываем в модалке
             const errorMessage = error.reason || error.message || "Staking failed. Please try again.";
             if (window.openModal) {
                 window.openModal('error', errorMessage);

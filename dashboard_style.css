@@ -48,7 +48,10 @@
     font-family: 'Orbitron', sans-serif;
 }
 
-.stat-value.neon-blue { color: #ffcc00; text-shadow: 0 0 15px #ffcc00; }
+.stat-value.neon-blue { 
+    color: #ffaa00; 
+    filter: drop-shadow(0 0 5px #ffcc00);
+}
 .stat-value.neon-cyan { color: #00f2ff; text-shadow: 0 0 5px #00f2ff; }
 
 /* ============================================================
@@ -279,12 +282,8 @@
 .legend {
     font-size: 24px;
     font-weight: 800;
-    color: #ffcc00; 
-    text-shadow: 
-        0 0 12px #e9d205,
-        0 0 28px #c5c20b,
-        0 0 50px #b3a20b,
-        0 0 75px #f0d90d;
+    color: #ffaa00; 
+    filter: drop-shadow(0 0 5px #ffcc00);
 }
 
 .epic-legend {

@@ -226,7 +226,7 @@
 .refresh-btn {
     background: none;
     border: none;
-    color: #ffcc00;
+    color: #ffaa00; 
     filter: drop-shadow(0 0 5px #ffcc00);
     cursor: pointer;
     font-size: 18px;

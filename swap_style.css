@@ -13,7 +13,7 @@
     border-radius: 20px;
     backdrop-filter: blur(12px);
     box-sizing: border-box;
-    padding: 10px;
+    padding: 30px;
     width: 100%;           
     max-width: 400px;      
     gap: 15px;
@@ -49,7 +49,7 @@
     box-sizing: border-box;
     background: #000000;
     /* border: 1px solid #333; */
-    border-radius: 12px;
+    border-radius: 20px;
     display: flex;
     
     transition: 0.3s;
@@ -91,7 +91,8 @@
 
 .swap-hint {
     font-size: 0.7rem;
-    color: #555;
+    color: #ffaa00; 
+    filter: drop-shadow(0 0 5px #ffcc00);
     text-align: center;
     margin-top: 15px;
 }

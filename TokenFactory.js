@@ -14,27 +14,43 @@ const FACTORY_ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType"
 
 let selectedType = 0;
 
+
 function selectTokenType(type, element) {
     selectedType = type;
     document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('active'));
     element.classList.add('active');
 }
+const escapeHTML = (str) =>
+    String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 async function deployToken() {
     const name = document.getElementById('tokenName').value;
     const symbol = document.getElementById('tokenSymbol').value;
     const supply = document.getElementById('tokenSupply').value;
 
-    if (!name || !symbol || !supply) {
-        if (window.openModal) {
-            window.openModal('error', 'Please fill in all parameters to generate your token.');
-        } else {
-            alert("Empty Fields: Please fill in all parameters.");
-        }
-        return;
+    if (
+        !name.trim() ||
+        !symbol.trim() ||
+        !/^\d+$/.test(supply)
+    ) {
+        return window.openModal
+            ? window.openModal('error', 'Invalid input data')
+            : alert("Invalid input");
+    }
+    
+    const supplyBigInt = BigInt(supply);
+    if (supplyBigInt <= 0n) {
+        return alert("Supply must be greater than 0");
     }
 
     try {
+        await ensureCorrectNetwork();
+
         const network = await provider.getNetwork();
         const chainId = Number(network.chainId);
         const config = FACTORY_CONFIG[chainId];
@@ -46,38 +62,42 @@ async function deployToken() {
             return;
         }
 
-        // 1. Инициализация модалки
         if (window.openModal) {
-            window.openModal('loading', `Preparing to deploy ${name} (${symbol})...`);
+            const safeName = escapeHTML(name);
+            const safeSymbol = escapeHTML(symbol);
+
+             window.openModal('loading', `Preparing to deploy ${safeName} (${safeSymbol})...`);
         }
 
         const factory = new ethers.Contract(config.address, FACTORY_ABI, signer);
         
-        // 2. Отправка транзакции в кошелек
         const tx = await factory.createToken(name, symbol, supply, selectedType);
         
-        // 3. Статус: Ждем блокчейн
         if (window.openModal) {
             window.openModal('loading', 'Deploying your smart contract to the blockchain...', tx.hash);
         }
 
         await tx.wait();
 
-        // 4. УСПЕХ
         if (window.openModal) {
+            const safeName = escapeHTML(name);
+
             const successMsg = `
-                <div style="color: #00f2ff; font-weight: bold; margin-bottom: 10px;">Token Deployed Successfully!</div>
-                <p>Your custom smart contract <strong>${name}</strong> is now live on the network.</p>
+                <div style="color: #00f2ff; font-weight: bold; margin-bottom: 10px;">
+                    Token Deployed Successfully!
+                </div>
+                <p>
+                    Your custom smart contract <strong>${safeName}</strong> is now live on the network.
+                </p>
             `;
-            window.openModal('success', successMsg, tx.hash);
+
+            window.openModal('success', successMsg, tx.hash, {}, true);
         }
 
-        // Очистка полей
         document.getElementById('tokenName').value = "";
         document.getElementById('tokenSymbol').value = "";
         document.getElementById('tokenSupply').value = "";
 
-        // Обновляем список токенов пользователя
         setTimeout(() => { loadUserTokens(); }, 1500);
 
     } catch (e) {
@@ -142,12 +162,20 @@ async function loadUserTokens() {
 
         const allTokens = await Promise.all(tokenDataPromises);
 
+        const escape = (str) =>
+            String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
         list.innerHTML = allTokens.reverse().map(token => `
             <div class="token-item">
                 <div class="token-info">
                     <div class="token-header">
-                        <h4>${token.name} <span>(${token.symbol})</span></h4>
-                        <button class="copy-mini-btn" onclick="copyToClipboard('${token.addr}', this)">
+                        <h4>${escape(token.name)} <span>(${escape(token.symbol)})</span></h4>
+                        <button class="copy-mini-btn" data-addr="${escape(token.addr)}">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
@@ -158,6 +186,13 @@ async function loadUserTokens() {
                 </div>
             </div>
         `).join('');
+
+        list.querySelectorAll('.copy-mini-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const addr = btn.dataset.addr;
+                copyToClipboard(addr, btn);
+            });
+        });
 
     } catch (e) {
         console.error("Load dashboard error:", e);

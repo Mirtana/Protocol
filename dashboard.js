@@ -1,4 +1,3 @@
-// 1. Твои ссылки
 const pinataLinks = {
     1: "https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeiefgqgikud4zzjqjwygpzk7r4tnbddxczxuv7digwscv5lnck5n74",
     2: "https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafybeias3gmfaj6532haybgotwmf3ixtvuyp2ktbhv5tobh43kwwysnili",
@@ -28,24 +27,33 @@ const pinataLinks = {
 
 
 function createNFTCard(id, isOwned, realTokenId = null) {
-    const fullName = monthNames[id]; 
+    const escapeHTML = (str) =>
+        String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    const fullName = monthNames[id];
+    const safeName = escapeHTML(fullName);
+
     const imagePath = pinataLinks[id]; 
 
     const statusClass = isOwned ? 'unlocked' : 'locked';
     const statusText = isOwned ? 'Unlocked' : 'Locked';
 
-    // Если у нас есть реальный ID из контракта, используем его, иначе ID месяца
-    const transferId = (realTokenId !== null) ? realTokenId : id;
+    const transferId = (realTokenId !== null) ? Number(realTokenId) : Number(id);
 
     const actionButton = isOwned 
-        ? `<button onclick="prepareTransfer(${transferId}, '${fullName}')" class="btn-transfer-card">TRANSFER</button>`
+        ? `<button class="btn-transfer-card" data-id="${transferId}" data-name="${safeName}">TRANSFER</button>`
         : `<button onclick="showSection('nft-mint-section', this)" class="btn-mint-card">MINT NOW</button>`;
 
     return `
         <div class="nft-collection-card ${statusClass}">
-            <img src="${imagePath}" class="nft-card-img" alt="${fullName}">
+            <img src="${imagePath}" class="nft-card-img" alt="${safeName}">
             <div class="nft-card-info">
-                <h4 class="nft-month">${fullName}</h4>
+                <h4 class="nft-month">${safeName}</h4>
                 <span class="nft-status">${statusText}</span>
                 <div class="card-actions">${actionButton}</div>
             </div>
@@ -60,8 +68,17 @@ async function loadDashboard() {
 
     try {
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        const userAddress = await signer.getAddress();
+
+        let signer;
+        let userAddress;
+
+        try {
+            signer = await provider.getSigner();
+            userAddress = await signer.getAddress();
+        } catch (e) {
+            console.warn("Wallet not connected");
+            return;
+        }
         
         const network = await provider.getNetwork();
         const chainId = "0x" + network.chainId.toString(16).toLowerCase();
@@ -70,17 +87,30 @@ async function loadDashboard() {
 
         const nftContract = new ethers.Contract(currentConfig.nftAddress, NFT_ABI, signer);
 
-        // Получаем списки через новые функции твоего контракта
         const userTokenIds = await nftContract.getUserNFTs(userAddress);
         const userEditions = await nftContract.getUserEditions(userAddress);
 
-        // Создаем карту: какой месяц -> какой реальный ID токена
         const ownershipMap = {};
         userEditions.forEach((edition, index) => {
             ownershipMap[Number(edition)] = Number(userTokenIds[index]);
         });
 
         grid.innerHTML = '';
+
+        if (!grid.dataset.listenerAttached) {
+            grid.addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-transfer-card');
+                if (!btn) return;
+            
+                const id = Number(btn.dataset.id);
+                const name = btn.dataset.name;
+            
+                prepareTransfer(id, name);
+            });
+
+            grid.dataset.listenerAttached = "true";
+        }
+
         let ownedCount = 0;
 
         for (let monthId = 1; monthId <= 12; monthId++) {
@@ -89,7 +119,6 @@ async function loadDashboard() {
             
             if (isOwned) ownedCount++;
             
-            // Передаем realId в функцию создания карточки
             grid.innerHTML += createNFTCard(monthId, isOwned, realId);
         }
         
@@ -100,17 +129,28 @@ async function loadDashboard() {
     }
 }
 
-// 1. Подготовка трансфера
 function prepareTransfer(tokenId, name) {
+    
+    const escapeHTML = (str) =>
+        String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    const safeName = escapeHTML(name);
+    const safeTokenId = Number(tokenId);
+
     const content = `
         <div class="transfer-box" style="text-align:center;">
             <p style="margin-bottom: 15px; color: #fff; font-size: 14px;">
-                You are transferring <b>${name}</b><br>
-                <span style="color: #00f2ff; font-size: 12px;">Token ID: ${tokenId}</span>
+                You are transferring <b>${safeName}</b><br>
+                <span style="color: #00f2ff; font-size: 12px;">Token ID: ${safeTokenId}</span>
             </p>
             <input type="text" id="destAddress" placeholder="0x... Recipient Address" 
                    style="width:100%; padding:12px; border-radius:8px; border:1px solid #333; background:#1a1a1a; color:white; outline:none; font-size: 13px;">
-            <button onclick="executeTransfer(${tokenId}, '${name}')" class="mint-btn" 
+            <button id="confirmTransferBtn" class="mint-btn" 
                     style="margin-top: 20px; width: 100%; cursor: pointer;">
                 SEND ASSET
             </button>
@@ -119,19 +159,28 @@ function prepareTransfer(tokenId, name) {
 
     updateModal("Transfer NFT", content, false);
 
-    // --- УПРАВЛЕНИЕ ВИЗУАЛОМ (чтобы не ломать другие функции) ---
+    const btn = document.getElementById("confirmTransferBtn");
+    if (btn) {
+        btn.onclick = () => executeTransfer(safeTokenId, safeName);
+    }
+
     const txInfo = document.getElementById("txInfo");
     const closeBtn = document.getElementById("statusCloseBtn");
 
-    if (txInfo) txInfo.style.display = "none"; // Прячем блок стейкинга только сейчас
-    if (closeBtn) closeBtn.style.display = "none"; // Прячем кнопку закрытия
+    if (txInfo) txInfo.style.display = "none";
+    if (closeBtn) closeBtn.style.display = "none";
 }
 
-// 2. Выполнение транзакции
 async function executeTransfer(tokenId, name) {
     const to = document.getElementById('destAddress').value.trim();
     const txInfo = document.getElementById("txInfo");
     const closeBtn = document.getElementById("statusCloseBtn");
+
+    if (!window.ethereum) {
+        updateModal("Error", "Wallet not found", false);
+        if (closeBtn) closeBtn.style.display = "block";
+        return;
+    }
 
     if (!ethers.isAddress(to)) {
         updateModal("Error", "Invalid wallet address.", false);
@@ -146,29 +195,43 @@ async function executeTransfer(tokenId, name) {
         const signer = await provider.getSigner();
         const network = await provider.getNetwork();
         const chainId = "0x" + network.chainId.toString(16).toLowerCase();
-        const currentConfig = NETWORKS[chainId];
+
+        const currentConfig = NETWORKS?.[chainId];
+
+        if (!currentConfig || !currentConfig.nftAddress) {
+            updateModal("Error", "Unsupported network", false);
+            if (closeBtn) closeBtn.style.display = "block";
+            return;
+        }
         
         const nftContract = new ethers.Contract(currentConfig.nftAddress, NFT_ABI, signer);
         const tx = await nftContract.safeTransferFrom(await signer.getAddress(), to, tokenId);
         
         let explorerBase = currentConfig.explorer || "";
-        explorerBase = explorerBase.replace(/\/$/, ''); 
+        explorerBase = explorerBase.replace(/\/$/, '');
         const explorerUrl = `${explorerBase}/${tx.hash}`;
         
+           
+        const safeHash = escapeHTML(tx.hash);  
+
         const pendingContent = `
             <div style="text-align:center;">
                 <p>Transferring <b>${name}</b>...</p>
-                <p style="margin: 15px 0;"><small style="opacity:0.5; font-size:10px; word-break:break-all;">Hash: ${tx.hash}</small></p>
+                <p style="margin: 15px 0;">
+                    <small style="opacity:0.5; font-size:10px; word-break:break-all;">
+                        Hash: ${safeHash}
+                    </small>
+                </p>
             </div>
         `;
         updateModal("Pending", pendingContent, true);
 
-        // Показываем блок со ссылкой, но без текста "Staked"
         if (txInfo) {
             txInfo.style.display = "block";
+
             const stakedText = txInfo.querySelector('p');
-            if (stakedText) stakedText.style.display = "none"; // Скрываем именно "Staked: 0 MIRTA"
-            
+            if (stakedText) stakedText.style.display = "none";
+
             const link = document.getElementById("explorerLink");
             if (link) {
                 link.href = explorerUrl;
@@ -179,26 +242,24 @@ async function executeTransfer(tokenId, name) {
         await tx.wait();
 
         updateModal("Success", `<b>${name}</b> successfully transferred!`, false);
-        if (closeBtn) closeBtn.style.display = "block"; // Показываем кнопку в самом конце
+        if (closeBtn) closeBtn.style.display = "block";
 
-        setTimeout(() => { if (typeof loadDashboard === "function") loadDashboard(); }, 2000);
+        setTimeout(() => {
+            if (typeof loadDashboard === "function") loadDashboard();
+        }, 2000);
 
     } catch (e) {
         console.error(e);
-        updateModal("Error", e.reason || "Transaction failed", false);
+
+        let errorMsg = e.reason || e.message || "Transaction failed";
+
+        updateModal("Error", errorMsg, false);
         if (closeBtn) closeBtn.style.display = "block";
         
-        // Возвращаем видимость тексту стейкинга для других функций при закрытии
         const stakedText = txInfo?.querySelector('p');
         if (stakedText) stakedText.style.display = "block";
     }
 }
-
-
-
-
-
-
 
 function updateModal(title, content, showLoader = false) {
     const modal = document.getElementById("statusModal");
@@ -215,10 +276,8 @@ function updateModal(title, content, showLoader = false) {
     titleEl.innerText = title;
     messageEl.innerHTML = content;
     
-    // Лоадер
     if (loaderEl) loaderEl.style.display = showLoader ? "block" : "none";
     
-    // Кнопка CLOSE
     if (closeBtn) {
         closeBtn.style.display = showLoader ? "none" : "block";
         closeBtn.onclick = () => modal.style.display = "none";

@@ -6,17 +6,14 @@
     <title>Mirtana Protocol</title>
 
     <link rel="icon" type="image/png" href="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafkreiecamcbd6dgjps5j4e6dyfnkwxybqxsaldoxkd5jtt7zk5iwvarym">
-    
     <link rel="apple-touch-icon" href="https://orange-characteristic-lion-588.mypinata.cloud/ipfs/bafkreiecamcbd6dgjps5j4e6dyfnkwxybqxsaldoxkd5jtt7zk5iwvarym">
 
-     <!-- Подключение шрифтов Google -->
+     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Здесь подключаешь нужные шрифты -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;700;900&family=UnifrakturMaguntia&family=Cormorant+Garamond:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&family=Alegreya:wght@400;700;900&family=Domine:wght@400;500;600;700&family=Spectral:wght@400;500;600;700&family=Fraunces:wght@400;500;700&family=Instrument+Serif:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-
+    
     <link rel="stylesheet" href="style-header.css">
     <link rel="stylesheet" href="main_container_style.css">
     <link rel="stylesheet" href="modal_style.css">
@@ -28,7 +25,7 @@
     <link rel="stylesheet" href="ATTENTION.css">
     <link rel="stylesheet" href="nft_style.css">
     <link rel="stylesheet" href="dashboard_style.css">
-
+    <link rel="stylesheet" href="echo_mirtana.css">
     
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -94,11 +91,9 @@
      <button class="nav-item" onclick="showSection('staking-section', this)">STAKING</button>
      <button class="nav-item" onclick="showSection('TransferToken-section', this)">Send MIRTA</button>
      <button class="nav-item" onclick="showSection('TokenFactory-section', this)">Create Token</button>
-
      <button class="nav-item" onclick="showSection('dashboard-section', this)">Dashboard</button>
-     
      <button class="nav-item" onclick="showSection('nft-mint-section', this)">NFT MINT</button>
-
+     <button class="nav-item" onclick="showSection('mirta-echo-section', this)">MIRTA ECHO</button>
     </nav> 
       
     
@@ -194,7 +189,7 @@
                 </div>
                 
                 <button class="mint-btn" id="swapBtn" onclick="swapMirta()">SWAP NOW</button>
-                <p class="swap-hint">* Required MIRTA Approval before swapping</p>
+                <p class="swap-hint">Required MIRTA Approval before swapping</p>
             </div>
         </section>
     </div>
@@ -571,6 +566,45 @@
             </div>
     </div>
 
+    <div id="mirta-echo-section" class="tab-content">
+        <div class="echo-create-container">
+            <div class="swap-card echo-card-fix">
+                <h3>Create <span class="highlight">Echo</span></h3>
+                <p class="swap-price-info">
+                    Publication cost: <span id="current-echo-price" class="highlight">...</span> <span class="highlight">MIRTA</span>
+                </p>
+
+                <div class="input-group">
+                    <label>Your message (max. 145 characters)</label>
+                    <div class="input-wrapper echo-input-wrapper">
+                        <textarea id="echo-message" maxlength="145" placeholder="What would you like to share with the Mirtana community?"></textarea>
+                    </div>
+                    <div class="char-counter"><span id="char-count">0</span>/145</div>
+                </div>
+
+
+                <button id="postEchoBtn" class="swap-btn-style" onclick="publishToEcho()">Publish in Echo</button>
+                <p class="swap-hint">The publication will disappear after 24 hours.</p>
+                <p class="nft-requirement-hint" style="color: rgb(250, 38, 10); filter: drop-shadow(0 0 25px rgb(250, 38, 10)); font-size: 16px; margin-top: 12px; text-align: center; opacity: 0.8;">
+                    Publications are available only to Mirtana NFT holders!
+                </p>
+            </div>
+        </div>
+    
+        <div class="echo-grid-container">
+            <h2 class="grid-title">
+                Echo <span class="highlight">Community</span> 
+                <span id="active-echo-count" style="font-size: 0.6em; opacity: 0.7; margin-left: 10px;">( 0 Active posts)</span>
+            </h2>
+        
+            <div id="echo-feed-grid" class="plans-grid">
+                <div class="echo-loading-status" style="color: #666; text-align: center; width: 100%;">
+                    Loading live messages...
+                </div>
+            </div>
+        </div>
+    </div>
+
     </main>
 
 
@@ -593,7 +627,7 @@
                 <a href="https://x.com/MirtanaProtocol" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
                 <a href="https://t.me/mirtanaprotocol" target="_blank"><i class="fab fa-telegram"></i></a>
                 <a href="https://discord.gg/SdwEBqRrQj" target="_blank"><i class="fab fa-discord"></i></a>
-                <!-- <a href="https://github.com/Mirtana/Protocol.git" target="_blank"><i class="fab fa-github"></i></a> -->
+                <a href="https://github.com/Mirtana/Protocol.git" target="_blank"><i class="fab fa-github"></i></a>
                 <a href="https://explorer.testnet.chain.robinhood.com/" target="_blank"><i class="fa-solid fa-feather"></i></a>
                 <a href="https://testnet.arcscan.app/" target="_blank"><i class="fa-brands fa-airbnb"></i></a>
             </div>
@@ -637,24 +671,16 @@
     <canvas id="circuitCanvas"></canvas>
 
     <script src="app-connect.js"></script>
-
     <script src="DailyGM.js"></script>
-
     <script src="background.js"></script>
-
     <script src="staking.js"></script>
-
     <script src="swap.js"></script>
-    
     <script src="TokenFactory.js"></script>
-    
     <script src="Transfer_MIRTA.js"></script>
-
     <script src="NFT_Mirtana.js"></script>
-
     <script src="dashboard.js"></script>
-
-    
+    <script src="echo_mirtana.js"></script>
+    <script src="filter.js"></script>
 
 
 </body>
