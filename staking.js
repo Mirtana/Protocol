@@ -307,7 +307,7 @@ async function unstake(tier) {
                     </div>
                 </div>
             `;
-            window.openModal('success', successHtml, tx.hash);
+            window.openModal('success', successHtml, tx.hash, {}, true);
         }
 
         // Обновляем список стейков на странице
