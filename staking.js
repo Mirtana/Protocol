@@ -303,7 +303,7 @@ async function unstake(tier) {
                     </div>
                     <div style="margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; display: flex; justify-content: space-between; font-weight: bold;">
                         <span>Total Received:</span>
-                        <span style="color: #fff;">${totalAmount}</span>
+                        <span style="color: #fff;">${totalAmount}MIRTA</span>
                     </div>
                 </div>
             `;
