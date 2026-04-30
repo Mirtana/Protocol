@@ -61,8 +61,7 @@ async function connect() {
         if (setupContracts(chainId, signer)) {
             document.getElementById('connect-btn').innerText = `${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
             document.getElementById('balances').classList.remove('hidden');
-            document.getElementById('mintBtn').disabled = false;
-            document.getElementById('mintBtnText').innerText = "MINT NOW";
+            document.getElementById('mintBtn').disabled = false;            document.getElementById('mintBtnText').innerText = "MINT NOW";
 
             await fetchMIRTAData();
             await updateBalances();
@@ -455,6 +454,8 @@ function openModal(type, message, txHash = null, extra = {}, isHtml = false) {
     }
 }
 
+window.openModal = openModal;
+            
 function closeStatusModal() {
     const modal = document.getElementById('statusModal');
     if (modal) modal.style.display = 'none';
