@@ -8,6 +8,11 @@ const MIRTA_CONFIG = {
     5042002: {
         address: "0xad4d6Ed80F18768a1DdE5f2b6a97a900A5C874e1",
         explorer: "https://testnet.arcscan.app/tx/"
+    },
+    // Kii Testnet Oro (ChainID: 1336)
+    1336: { 
+        address: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
+        explorer: "https://testnet.explorer.kiichain.io/tx/"
     }
 };
 

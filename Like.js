@@ -10,6 +10,11 @@
             likesAddress: "0xcd01d2f8c7910a62a39803834Be53694eaa884AF",
             mirtaAddress: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
             explorer: "https://explorer.testnet.chain.robinhood.com/tx/"
+        },
+        "0x538": { // 
+            likesAddress: "0xBf42e4059164a7d20e40811092EF6D51AF7FA81A",
+            mirtaAddress: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
+            explorer: "https://testnet.explorer.kiichain.io/tx/"
         }
     };
 

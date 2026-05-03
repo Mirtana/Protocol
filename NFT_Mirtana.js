@@ -8,6 +8,11 @@ const NETWORKS = {
         nftAddress: '0xa37b518e9CC09FFb3280810Ff456999AC84D10cc',
         mirtaToken: '0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6', 
         explorer: 'https://explorer.testnet.chain.robinhood.com/tx/'
+    },
+    "0x538": {
+        nftAddress: '0xd46882eaF6a6afFBBDA58b82eff7934D2551E402',
+        mirtaToken: '0x97773AAb730103aa2957E2Cc299488c41753b54C', 
+        explorer: 'https://testnet.explorer.kiichain.io/tx/'
     }
 };
 

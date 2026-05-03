@@ -78,7 +78,12 @@ async function swapMirta() {
         const net = await provider.getNetwork();
         const chainId = Number(net.chainId);
         
-        const symbol = (chainId === 5042002) ? "USDC" : "ETH";
+                let symbol = "ETH"; 
+        if (chainId === 5042002) {
+            symbol = "USDC";
+        } else if (chainId === 1336) {
+            symbol = "KII";
+        }        
         
         const amountWei = ethers.parseUnits(amountInput, 18);
         const userAddress = await signer.getAddress();
@@ -128,8 +133,12 @@ async function updateNetworkIdentity() {
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
 
-    const isArc = (chainId === 5042002);
-    const symbol = isArc ? "USDC" : "ETH";
+        let symbol = "ETH";
+    if (chainId === 5042002) {
+        symbol = "USDC";
+    } else if (chainId === 1336) {
+        symbol = "KII"; // Для сети KiiChain
+    }    
 
     const elements = {
         'swapTitleSymbol': symbol,
@@ -143,12 +152,14 @@ async function updateNetworkIdentity() {
     }
     const nativeIcon = document.getElementById('native-icon');
     if (nativeIcon) {
-        if (isArc) {
+        if (chainId === 5042002) {
             nativeIcon.className = 'fas fa-dollar-sign';
+        } else if (chainId === 1336) {
+            nativeIcon.className = 'fas fa-coins'; // Или любая другая подходящая иконка FontAwesome
         } else {
             nativeIcon.className = 'fab fa-ethereum';
         }
-    }
+    }    
 }
 
 updateNetworkIdentity();

@@ -129,6 +129,7 @@ async function loadDashboard() {
     }
 }
 
+
 function prepareTransfer(tokenId, name) {
     
     const escapeHTML = (str) =>

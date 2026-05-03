@@ -23,6 +23,16 @@ const CONTRACT_CONFIG = {
         rpcUrl: "https://rpc.testnet.arc.network"
     },
 
+    1336: { // Kii Testnet
+        networkName: "Kii Testnet",
+        nativeTicker: "KII",
+        MIRTA: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
+        SWAP_ADDRESS: "0x57bEDd058b9805B20613497aaB8dCcea1c0ED68E",
+        explorerUrl: "https://testnet.explorer.kiichain.io",
+        chainIdHex: "0x538",
+        rpcUrl: "https://json-rpc.uno.sentry.testnet.v3.kiivalidator.com"
+    },
+
     11155111: { // Sepolia
         networkName: "Sepolia",
         nativeTicker: "ETH",
@@ -61,7 +71,8 @@ async function connect() {
         if (setupContracts(chainId, signer)) {
             document.getElementById('connect-btn').innerText = `${userAccount.slice(0,6)}...${userAccount.slice(-4)}`;
             document.getElementById('balances').classList.remove('hidden');
-            document.getElementById('mintBtn').disabled = false;            document.getElementById('mintBtnText').innerText = "MINT NOW";
+            document.getElementById('mintBtn').disabled = false;
+            document.getElementById('mintBtnText').innerText = "MINT NOW";
 
             await fetchMIRTAData();
             await updateBalances();
@@ -99,7 +110,6 @@ async function initStaking() {
             if (ADDRESSES[chainId]) {
                 STAKING_ADDRESS = ADDRESSES[chainId].staking;
                 MIRTA_TOKEN_ADDRESS = ADDRESSES[chainId].token;
-                console.log(`✅ Connected to ${chainId}! Staking: ${STAKING_ADDRESS}`);
             } else {
                 console.error("❌ Unsupported network:", chainId);
                 return; 
@@ -382,12 +392,10 @@ function showSection(sectionId, element) {
     element.classList.add('active');
 
     if (sectionId === 'TokenFactory-section') {
-        console.log("Switching to Factory: Loading tokens...");
         loadUserTokens();
     }
 
     if (sectionId === 'dashboard-section') {
-        console.log("Navigation: Dashboard selected, calling loadDashboard()...");
         loadDashboard(); 
     }
 }
@@ -454,8 +462,6 @@ function openModal(type, message, txHash = null, extra = {}, isHtml = false) {
     }
 }
 
-window.openModal = openModal;
-            
 function closeStatusModal() {
     const modal = document.getElementById('statusModal');
     if (modal) modal.style.display = 'none';
