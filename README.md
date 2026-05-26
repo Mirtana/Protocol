@@ -1,4 +1,4 @@
-MirtanaProtocol
+MirtanaProtocol - https://mirtana.github.io/Protocol/
 
 MirtanaProtocol is a modern Web3 application with an intuitive interface, combining a wide range of DeFi and NFT mechanics. 
 The project is deployed and actively functions across four testnets: 
