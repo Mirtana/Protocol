@@ -15,25 +15,36 @@ Maintain your network activity every 24 hours and record your presence on the bl
 An opportunity to mint the protocol's primary token - MIRTA.
 
 Arc Network: 0.0001 USDC
+
 Robinhood Chain: 0.000001 ETH
+
 KII Chain: 0.00001 KII
+
 OPN Chain: 0.0001 OPN
 
 3. Swap (Buyback)
 Reverse swap of MIRTA tokens back to native network assets or stablecoins:
 
 MIRTA ➔ USDC (Arc): 0.0001 USDC
+
 MIRTA ➔ ETH (Robinhood): 0.0000009 ETH
+
 MIRTA ➔ KII (Kii Chain): 0.00001 KII
+
 MIRTA ➔ OPN (OPN Chain): 0.0001 OPN
+
 
 4. Staking
 Grow your holdings by choosing one of the four available staking plans:
 
 Flexible: 10.5% APY
+
 7 Days: 15% APY
+
 30 Days: 18% APY
+
 90 Days: 22.5% APY
+
 
 5. Send MIRTA
 Simple and fast transfer of MIRTA tokens between wallets within the supported networks.
@@ -58,9 +69,11 @@ Features: On-chain liking system and a transfer function for each individual NFT
 Hall of Months: A personalized dashboard to showcase and view your collection.
 
 8. On-Chain Liking System (NFT Likes)
-An interactive mechanic for engaging with the collection. Users can express their appreciation and leave likes under any of the 12 NFTs. Every action is fully recorded and processed by smart contracts across the Arc Network, Robinhood Chain, KII Chain, and OPN Chain.
+An interactive mechanic for engaging with the collection.
+Users can express their appreciation and leave likes under any of the 12 NFTs.
+Every action is fully recorded and processed by smart contracts across the Arc Network, Robinhood Chain, KII Chain, and OPN Chain.
 
-9. MIRTA ECHO (SocialFi)
+10. MIRTA ECHO (SocialFi)
 A decentralized platform for communication among NFT holders.
 
 Access: Requires holding at least 1 NFT from the MirtanaProtocol collection.
@@ -72,8 +85,11 @@ Mechanics: A post of up to 145 characters lives on the blockchain for 24 hours, 
 Ranking System (Visual highlighting of posts):
 
 1-5 NFTs: Rank: Loyal Custodian
+
 6-11 NFTs: Rank: Epic Hero
+
 12 NFTs: Rank: Legend of Myrtana
+
 
 🔗 Smart Contract Addresses
 
