@@ -3,30 +3,39 @@
 // ==========================================
 
 const ADDRESSES = {
+
+     5042002: { // Arc Testnet
+        staking: "0x5956ac1Fc6178EC22d873dD1aC371E35253F5ff6",
+        token: "0xad4d6Ed80F18768a1DdE5f2b6a97a900A5C874e1",
+    },
+
     46630: { // Robinhood Testnet
         staking: "0x8AE8e28E19a66aDfD816Ab1833bAb8a734BDD09a",
         token: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
     },
-    5042002: {
-        staking: "0x5956ac1Fc6178EC22d873dD1aC371E35253F5ff6",
-        token: "0xad4d6Ed80F18768a1DdE5f2b6a97a900A5C874e1",
-    },
+   
 
     1336: { // Kii Testnet Oro
         staking: "0xB86BDBE15A8377c7627708Cc96b28f8b2ab44781", 
         token: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
     },
 
-    11155111: { // Sepolia
-        staking: "0x32446FdE8838482b3F8D0E4a9A28A1Df3cbCee5D", 
-        token: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
-    }
+    984: { // OPN Testnet
+        staking: "0xB86BDBE15A8377c7627708Cc96b28f8b2ab44781", 
+        token: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
+    },
+
+    // 11155111: { // Sepolia
+    //     staking: "0x32446FdE8838482b3F8D0E4a9A28A1Df3cbCee5D", 
+    //     token: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
+    // }
 };
 
 const EXPLORERS = {
     46630: "https://explorer.testnet.chain.robinhood.com/tx/",
     5042002: "https://testnet.arcscan.app/tx/",
     1336: "https://testnet.explorer.kiichain.io/tx/",
+    984: "https://testnet.iopn.tech/tx/",
     11155111: "https://sepolia.etherscan.io/tx/"
 };
 

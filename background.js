@@ -2,7 +2,7 @@ const canvas = document.getElementById('circuitCanvas');
 const ctx = canvas.getContext('2d');
 
 let width, height, particles = [];
-let mouse = { x: null, y: null, radius: 200 };
+let mouse = { x: null, y: null, radius: 150 };
 
 const SETTINGS = {
     particleCount: 80,    // Теперь можно больше, так как код стал легче
@@ -85,7 +85,7 @@ function init() {
 
 function animate() {
     // Делаем фон чуть прозрачным при очистке, чтобы оставался легкий шлейф (Motion Blur)
-    ctx.fillStyle = 'rgba(9, 10, 14, 0.2)'; 
+    ctx.fillStyle = 'rgba(17, 17, 19, 0.2)'; 
     ctx.fillRect(0, 0, width, height);
     
     // Убираем тень для линий, чтобы не тормозило

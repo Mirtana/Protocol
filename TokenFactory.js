@@ -1,18 +1,27 @@
 const FACTORY_CONFIG = {
+
+     // Arc Testnet
+    5042002: {
+        address: "0xA9960EcB55E45bEd1c860259a157c81c6c3d1C18",
+        explorer: "https://testnet.arcscan.app/tx/"
+    },
+
     // Robinhood Testnet
     46630: {
         address: "0x1f6ac462b6322A06496ba14bE5D6b39e75DB2B40",
         explorer: "https://explorer.testnet.chain.robinhood.com/tx/"
     },
-    // Arc Testnet
-    5042002: {
-        address: "0xA9960EcB55E45bEd1c860259a157c81c6c3d1C18",
-        explorer: "https://testnet.arcscan.app/tx/"
-    },
+   
     1336: { // Kii Testnet
         address: "0x661921D1ea46423de41D7bB349E3745844fb3C81",
         explorer: "https://testnet.explorer.kiichain.io/tx/"
+    },
+    
+    984: { // OPN Testnet (ChainID: 984)
+        address: "0xA9960EcB55E45bEd1c860259a157c81c6c3d1C18",
+        explorer: "https://testnet.iopn.tech/tx/"
     }
+
 };
 const FACTORY_ABI = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":false,"internalType":"address","name":"tokenAddress","type":"address"},{"indexed":false,"internalType":"string","name":"symbol","type":"string"},{"indexed":false,"internalType":"string","name":"tokenType","type":"string"}],"name":"TokenCreated","type":"event"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"allCreatedTokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"uint256","name":"supply","type":"uint256"},{"internalType":"uint8","name":"tokenType","type":"uint8"}],"name":"createToken","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAllTokensCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"_user","type":"address"}],"name":"getUserTokens","outputs":[{"internalType":"address[]","name":"","type":"address[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"name":"userToTokens","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
 

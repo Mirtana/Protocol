@@ -1,18 +1,27 @@
 const MIRTA_CONFIG = {
-    // Robinhood Testnet (ChainID: 46630)
-    46630: {
-        address: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
-        explorer: "https://explorer.testnet.chain.robinhood.com/tx/"
-    },
+
     // Arc Testnet (ChainID: 5042002)
     5042002: {
         address: "0xad4d6Ed80F18768a1DdE5f2b6a97a900A5C874e1",
         explorer: "https://testnet.arcscan.app/tx/"
     },
+
+    // Robinhood Testnet (ChainID: 46630)
+    46630: {
+        address: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
+        explorer: "https://explorer.testnet.chain.robinhood.com/tx/"
+    },
+  
     // Kii Testnet Oro (ChainID: 1336)
     1336: { 
         address: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
         explorer: "https://testnet.explorer.kiichain.io/tx/"
+    },
+    
+    // OPN Testnet (ChainID: 984)
+    984: { 
+        address: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
+        explorer: "https://testnet.iopn.tech/tx/"
     }
 };
 

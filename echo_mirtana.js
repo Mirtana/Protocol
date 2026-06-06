@@ -13,7 +13,13 @@ const ECHO_CONFIG = Object.freeze({
         echo: "0xc8C671AA28407DaeFb214Bc41a79D3605B20616c",
         nft:  "0xd46882eaF6a6afFBBDA58b82eff7934D2551E402",
         explorer: "https://testnet.explorer.kiichain.io/tx/"
+    }),
+    "0x3d8": Object.freeze({
+        echo: "0xA56026ab3EBBd8937a1572b20118f61851fdf84E",
+        nft:  "0xE952ee8BA2B025f8Fa17779fb18aDeA387cAC811",
+        explorer: "https://testnet.iopn.tech/tx/"
     })
+    
 });
 
 

@@ -11,11 +11,18 @@
             mirtaAddress: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
             explorer: "https://explorer.testnet.chain.robinhood.com/tx/"
         },
-        "0x538": { // 
+        "0x538": { // Kii Testnet
             likesAddress: "0xBf42e4059164a7d20e40811092EF6D51AF7FA81A",
             mirtaAddress: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
             explorer: "https://testnet.explorer.kiichain.io/tx/"
-        }
+        },
+         "0x3d8": { //  OPN Testnet
+            likesAddress: "0xe7b781b80802391979EF65b8F753A6E02845b843",
+            mirtaAddress: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
+            explorer: "https://testnet.iopn.tech/tx/"
+        },
+        
+
     };
 
     const ERC20_ABI_LIKE = [

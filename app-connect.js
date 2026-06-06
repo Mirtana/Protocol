@@ -3,15 +3,6 @@
 // ==========================================
 
 const CONTRACT_CONFIG = {
-    46630: { // Robinhood Chain Testnet
-        networkName: "Robinhood Chain Testnet",
-        nativeTicker: "ETH",
-        MIRTA: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
-        SWAP_ADDRESS: "0xEf2EA09A748348f1D7e2D8ebF8534540FB0a21f1",
-        explorerUrl: "https://explorer.testnet.chain.robinhood.com",
-        chainIdHex: "0xB626",
-        rpcUrl: "https://rpc.testnet.chain.robinhood.com"
-    },   
 
     5042002: { // Arc Testnet
         networkName: "Arc Testnet",
@@ -23,6 +14,18 @@ const CONTRACT_CONFIG = {
         rpcUrl: "https://rpc.testnet.arc.network"
     },
 
+
+    46630: { // Robinhood Chain Testnet
+        networkName: "Robinhood Chain Testnet",
+        nativeTicker: "ETH",
+        MIRTA: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
+        SWAP_ADDRESS: "0xEf2EA09A748348f1D7e2D8ebF8534540FB0a21f1",
+        explorerUrl: "https://explorer.testnet.chain.robinhood.com",
+        chainIdHex: "0xB626",
+        rpcUrl: "https://rpc.testnet.chain.robinhood.com"
+    },   
+
+
     1336: { // Kii Testnet
         networkName: "Kii Testnet",
         nativeTicker: "KII",
@@ -33,15 +36,25 @@ const CONTRACT_CONFIG = {
         rpcUrl: "https://json-rpc.uno.sentry.testnet.v3.kiivalidator.com"
     },
 
-    11155111: { // Sepolia
-        networkName: "Sepolia",
-        nativeTicker: "ETH",
-        MIRTA: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
-        SWAP_ADDRESS: "0x0000000000000000000000000000000000000000",
-        explorerUrl: "https://sepolia.etherscan.io",
-        chainIdHex: "0xaa36a7",
-        rpcUrl: "https://rpc.sepolia.org"
-    }
+     984: { // OPN Testnet
+        networkName: "OPN Testnet",
+        nativeTicker: "OPN",
+        MIRTA: "0x9c256267EA5Fc6f77469bd0cB18498C335349Ab6",
+        SWAP_ADDRESS: "0x0A0F9e4673D8B827aC5cF519Db05B6464Ce69A53",
+        explorerUrl: "https://testnet.iopn.tech",
+        chainIdHex: "0x3d8",
+        rpcUrl: "https://testnet-rpc.iopn.tech"
+    },
+
+    // 11155111: { // Sepolia
+    //     networkName: "Sepolia",
+    //     nativeTicker: "ETH",
+    //     MIRTA: "0x97773AAb730103aa2957E2Cc299488c41753b54C",
+    //     SWAP_ADDRESS: "0x0000000000000000000000000000000000000000",
+    //     explorerUrl: "https://sepolia.etherscan.io",
+    //     chainIdHex: "0xaa36a7",
+    //     rpcUrl: "https://rpc.sepolia.org"
+    // }
 };
 const SWAP_ABI = [{"inputs":[{"internalType":"address","name":"_mirtaToken","type":"address"},{"internalType":"uint256","name":"_initialPrice","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},{"inputs":[],"name":"ReentrancyGuardReentrantCall","type":"error"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"LiquidityAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"mirtaAmount","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"ethAmount","type":"uint256"}],"name":"Swapped","type":"event"},{"inputs":[],"name":"buyBackPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"fundLiquidity","outputs":[],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"mirtaToken","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_newPrice","type":"uint256"}],"name":"setBuyBackPrice","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_mirtaAmount","type":"uint256"}],"name":"swapMirtaToEth","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawEth","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"withdrawMirta","outputs":[],"stateMutability":"nonpayable","type":"function"},{"stateMutability":"payable","type":"receive"}];
 

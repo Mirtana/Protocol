@@ -78,12 +78,14 @@ async function swapMirta() {
         const net = await provider.getNetwork();
         const chainId = Number(net.chainId);
         
-                let symbol = "ETH"; 
-        if (chainId === 5042002) {
-            symbol = "USDC";
-        } else if (chainId === 1336) {
-            symbol = "KII";
-        }        
+          let symbol = "ETH"; 
+       if (chainId === 5042002) {
+           symbol = "USDC";
+       } else if (chainId === 1336) {
+           symbol = "KII";
+       } else if (chainId === 984) { 
+           symbol = "OPN";
+       }            
         
         const amountWei = ethers.parseUnits(amountInput, 18);
         const userAddress = await signer.getAddress();
@@ -133,12 +135,14 @@ async function updateNetworkIdentity() {
     const network = await provider.getNetwork();
     const chainId = Number(network.chainId);
 
-        let symbol = "ETH";
-    if (chainId === 5042002) {
-        symbol = "USDC";
-    } else if (chainId === 1336) {
-        symbol = "KII"; // Для сети KiiChain
-    }    
+         let symbol = "ETH"; 
+if (chainId === 5042002) {
+    symbol = "USDC";
+} else if (chainId === 1336) {
+    symbol = "KII";
+} else if (chainId === 984) {
+    symbol = "OPN";
+}
 
     const elements = {
         'swapTitleSymbol': symbol,

@@ -19,6 +19,7 @@ body {
     overflow-x: hidden;
 }
 
+
 #circuitCanvas {
     position: fixed; 
     top: 0;
